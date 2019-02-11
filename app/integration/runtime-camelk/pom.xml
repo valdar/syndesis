@@ -64,10 +64,56 @@
     </dependency>
 
     <!-- camel-k -->
+    <!--
     <dependency>
       <groupId>org.apache.camel.k</groupId>
       <artifactId>camel-k-runtime-core</artifactId>
       <version>0.2.1-SNAPSHOT</version>
+    </dependency>
+    -->
+     <!-- temporary dependency for camel-k snapshots -->
+    <dependency>
+      <groupId>com.github.apache</groupId>
+      <artifactId>camel-k</artifactId>
+      <version>master-SNAPSHOT</version>
+      <exclusions>
+        <exclusion>
+          <groupId>com.github.apache.camel-k</groupId>
+          <artifactId>camel-k-runtime-groovy</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>com.github.apache.camel-k</groupId>
+          <artifactId>camel-k-runtime-kotlin</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>com.github.apache.camel-k</groupId>
+          <artifactId>camel-k-runtime-jvm</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>com.github.apache.camel-k</groupId>
+          <artifactId>camel-k-runtime-spring-boot</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>com.github.apache.camel-k</groupId>
+          <artifactId>camel-k-runtime-spring-boot-layout</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>com.github.apache.camel-k</groupId>
+          <artifactId>camel-k-runtime-yaml</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>com.github.apache.camel-k</groupId>
+          <artifactId>camel-k-maven-plugin</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>com.github.apache.camel-k</groupId>
+          <artifactId>camel-knative</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>com.github.apache.camel-k</groupId>
+          <artifactId>camel-knative-http</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <dependency>
@@ -199,4 +245,13 @@
       </plugin>
     </plugins>
   </build>
+
+  <!-- temporary repository for camel-k snapshots -->
+  <repositories>
+    <repository>
+      <id>jitpack.io</id>
+      <url>https://jitpack.io</url>
+    </repository>
+  </repositories>
+
 </project>

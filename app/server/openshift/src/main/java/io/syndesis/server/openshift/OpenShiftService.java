@@ -15,19 +15,20 @@
  */
 package io.syndesis.server.openshift;
 
-import io.fabric8.kubernetes.api.model.Doneable;
-import io.fabric8.kubernetes.api.model.HasMetadata;
-import io.fabric8.kubernetes.api.model.KubernetesResourceList;
-import io.fabric8.kubernetes.api.model.apiextensions.CustomResourceDefinition;
-import io.fabric8.kubernetes.client.dsl.Resource;
-import io.fabric8.openshift.api.model.DeploymentConfig;
-import io.fabric8.openshift.api.model.User;
-
 import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
+
+import io.fabric8.kubernetes.api.model.Doneable;
+import io.fabric8.kubernetes.api.model.HasMetadata;
+import io.fabric8.kubernetes.api.model.KubernetesResourceList;
+import io.fabric8.kubernetes.api.model.Secret;
+import io.fabric8.kubernetes.api.model.apiextensions.CustomResourceDefinition;
+import io.fabric8.kubernetes.client.dsl.Resource;
+import io.fabric8.openshift.api.model.DeploymentConfig;
+import io.fabric8.openshift.api.model.User;
 
 public interface OpenShiftService {
 
@@ -187,4 +188,5 @@ public interface OpenShiftService {
      */
     <T extends HasMetadata, L extends KubernetesResourceList<T>, D extends Doneable<T>> Resource<T, D> getCR(CustomResourceDefinition crd, Class<T> resourceType, Class<L> resourceListType, Class<D> doneableResourceType, String customResourceName);
 
+    void createOrReplaceSecret(Secret secret);
 }

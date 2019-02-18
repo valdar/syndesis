@@ -15,21 +15,22 @@
  */
 package io.syndesis.server.openshift;
 
-import io.fabric8.kubernetes.api.model.Doneable;
-import io.fabric8.kubernetes.api.model.HasMetadata;
-import io.fabric8.kubernetes.api.model.KubernetesResourceList;
-import io.fabric8.kubernetes.api.model.apiextensions.CustomResourceDefinition;
-import io.fabric8.kubernetes.client.dsl.Resource;
-import io.fabric8.openshift.api.model.DeploymentConfig;
-import io.fabric8.openshift.api.model.User;
-import io.fabric8.openshift.api.model.UserBuilder;
-
 import java.io.InputStream;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
+
+import io.fabric8.kubernetes.api.model.Doneable;
+import io.fabric8.kubernetes.api.model.HasMetadata;
+import io.fabric8.kubernetes.api.model.KubernetesResourceList;
+import io.fabric8.kubernetes.api.model.Secret;
+import io.fabric8.kubernetes.api.model.apiextensions.CustomResourceDefinition;
+import io.fabric8.kubernetes.client.dsl.Resource;
+import io.fabric8.openshift.api.model.DeploymentConfig;
+import io.fabric8.openshift.api.model.User;
+import io.fabric8.openshift.api.model.UserBuilder;
 
 public class OpenShiftServiceNoOp implements OpenShiftService {
 
@@ -122,5 +123,9 @@ public class OpenShiftServiceNoOp implements OpenShiftService {
     @Override
     public Optional<String> getExposedHost(String name) {
         return Optional.empty();
+    }
+
+    @Override
+    public void createOrReplaceSecret(Secret secret) {
     }
 }

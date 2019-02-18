@@ -15,14 +15,35 @@
  */
 package io.syndesis.server.controller.integration.camelk;
 
+import java.io.IOException;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Properties;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.stream.Collectors;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.google.common.collect.ImmutableSet;
+import io.fabric8.kubernetes.api.model.Secret;
+import io.fabric8.kubernetes.api.model.SecretBuilder;
 import io.fabric8.kubernetes.api.model.apiextensions.CustomResourceDefinition;
 import io.syndesis.common.model.Dependency;
+import io.syndesis.common.model.Kind;
+import io.syndesis.common.model.ResourceIdentifier;
+import io.syndesis.common.model.integration.Flow;
 import io.syndesis.common.model.integration.Integration;
 import io.syndesis.common.model.integration.IntegrationDeployment;
 import io.syndesis.common.model.integration.IntegrationDeploymentState;
+import io.syndesis.common.model.integration.Step;
+import io.syndesis.common.model.integration.StepKind;
+import io.syndesis.common.model.openapi.OpenApi;
 import io.syndesis.common.util.Json;
 import io.syndesis.common.util.Labels;
 import io.syndesis.common.util.Names;
@@ -38,6 +59,7 @@ import io.syndesis.server.controller.integration.camelk.crd.DoneableIntegration;
 import io.syndesis.server.controller.integration.camelk.crd.ImmutableIntegrationSpec;
 import io.syndesis.server.controller.integration.camelk.crd.IntegrationList;
 import io.syndesis.server.controller.integration.camelk.crd.IntegrationSpec;
+import io.syndesis.server.controller.integration.camelk.crd.ResourceSpec;
 import io.syndesis.server.controller.integration.camelk.crd.SourceSpec;
 import io.syndesis.server.dao.IntegrationDao;
 import io.syndesis.server.dao.IntegrationDeploymentDao;
@@ -46,17 +68,6 @@ import io.syndesis.server.openshift.OpenShiftService;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
-
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Properties;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.stream.Collectors;
-
-import static java.nio.charset.StandardCharsets.UTF_8;
 
 @Component
 @Qualifier("camel-k")
@@ -101,6 +112,8 @@ public class CamelKPublishHandler extends BaseHandler implements StateChangeHand
     private final IntegrationProjectGenerator projectGenerator;
     private final VersionService versionService;
 
+    private boolean compress;
+
     public CamelKPublishHandler(OpenShiftService openShiftService,
                                 IntegrationDao iDao,
                                 IntegrationDeploymentDao idDao,
@@ -112,6 +125,9 @@ public class CamelKPublishHandler extends BaseHandler implements StateChangeHand
         this.projectGenerator = projectGenerator;
         this.resourceManager = resourceManager;
         this.versionService = versionService;
+
+        // this should be taken from a configuration
+        this.compress = false;
     }
 
     @Override
@@ -141,8 +157,12 @@ public class CamelKPublishHandler extends BaseHandler implements StateChangeHand
 
         logInfo(integrationDeployment,"Creating Camel-K resource");
 
-        io.syndesis.server.controller.integration.camelk.crd.Integration camelkIntegration = createCamelkIntegration(integrationDeployment);
+        prepareDeployment(integrationDeployment);
 
+        io.syndesis.server.controller.integration.camelk.crd.Integration camelkIntegration = createCamelkIntegration(integrationDeployment);
+        Secret camelkSecrets = createCamelkIntegrationSecret(integrationDeployment);
+
+        getOpenShiftService().createOrReplaceSecret(camelkSecrets);
         getOpenShiftService().createOrReplaceCR(integrationCRD,
                                                 io.syndesis.server.controller.integration.camelk.crd.Integration.class,
                                                 IntegrationList.class,
@@ -154,14 +174,26 @@ public class CamelKPublishHandler extends BaseHandler implements StateChangeHand
         return new StateUpdate(IntegrationDeploymentState.Pending, stepsDone);
     }
 
-    private io.syndesis.server.controller.integration.camelk.crd.Integration createCamelkIntegration(IntegrationDeployment integrationDeployment) {
+    protected Secret createCamelkIntegrationSecret(IntegrationDeployment integrationDeployment) {
         final Integration integration = integrationDeployment.getSpec();
-        prepareDeployment(integrationDeployment);
 
         Properties applicationProperties = projectGenerator.generateApplicationProperties(integration);
 
-        String username = integrationDeployment.getUserId().orElseThrow(() -> new IllegalStateException("Couldn't find the user of the integration"));
+        //TODO: maybe add owner reference
+        Secret secret = new SecretBuilder()
+            .withNewMetadata()
+                .withName(Names.sanitize(integration.getId().get()))
+            .endMetadata()
+            .withData(Collections.singletonMap("application.properties", CamelKSupport.propsToString(applicationProperties)))
+            .build();
 
+        return secret;
+    }
+
+    protected io.syndesis.server.controller.integration.camelk.crd.Integration createCamelkIntegration(IntegrationDeployment integrationDeployment) {
+        final Integration integration = integrationDeployment.getSpec();
+
+        String username = integrationDeployment.getUserId().orElseThrow(() -> new IllegalStateException("Couldn't find the user of the integration"));
         String integrationId = integrationDeployment.getIntegrationId().orElseThrow(() -> new IllegalStateException("IntegrationDeployment should have an integrationId"));
         String version = Integer.toString(integrationDeployment.getVersion());
 
@@ -179,41 +211,29 @@ public class CamelKPublishHandler extends BaseHandler implements StateChangeHand
         result.getMetadata().getAnnotations().put(OpenShiftService.DEPLOYMENT_VERSION_LABEL, version);
 
         ImmutableIntegrationSpec.Builder integratinSpecBuilder = new IntegrationSpec.Builder();
-        //add configuration properties
-        integration.getConfiguredProperties().forEach((k, v) ->
-            integratinSpecBuilder.addConfiguration(new ConfigurationSpec.Builder()
-                                                            .type("property")
-                                                            .value(k+"="+v)
-                                                        .build()));
-        //add application properties
-        applicationProperties.stringPropertyNames().forEach(k ->
-            integratinSpecBuilder.addConfiguration(new ConfigurationSpec.Builder()
-                                                            .type("property")
-                                                            .value(k+"="+applicationProperties.getProperty(k))
-                                                        .build()));
+
         //add customizers
         integratinSpecBuilder.addConfiguration(new ConfigurationSpec.Builder()
             .type("property")
             .value("camel.k.customizer=metadata,logging")
             .build());
-        result.setSpec(integratinSpecBuilder.build());
+        integratinSpecBuilder.addConfiguration(new ConfigurationSpec.Builder()
+            .type("secret")
+            .value(Names.sanitize(integration.getId().get()))
+            .build());
 
         //add dependencies
-        getDependencies(integration).forEach( gav ->
-                integratinSpecBuilder.addDependencies("mvn:"+gav.getId()));
+        getDependencies(integration).forEach( gav -> integratinSpecBuilder.addDependencies("mvn:"+gav.getId()));
         integratinSpecBuilder.addDependencies("mvn:io.syndesis.integration:integration-runtime-camelk:"+versionService.getVersion());
 
 
-        String integrationJson = extractIntegrationJson(integration);
-        logInfo(integration,"integration.json: {}", integrationJson);
-        //TODO: add extensions as dependencies
-        //TODO: add atlasmapFiles as dependencies
-
-        integratinSpecBuilder.addSources(new SourceSpec.Builder()
-                                            .content(integrationJson)
-                                            .language("syndesis")
-                                            .name(Names.sanitize(integrationId))
-                                        .build());
+        try {
+            addMappingRules(integration, integratinSpecBuilder);
+            addOpenAPIDefinition(integration, integratinSpecBuilder);
+            addIntegrationSource(integration, integratinSpecBuilder);
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
+        }
 
         result.setSpec(integratinSpecBuilder.build());
         return result;
@@ -277,4 +297,84 @@ public class CamelKPublishHandler extends BaseHandler implements StateChangeHand
         logInfo(integrationDeployment, "isRunning");
         return CAMEL_K_RUNNING_STATES.contains(getCamelkIntegrationPhase(integrationDeployment, integrationCRD).orElse(null));
     }
+
+
+    private void addIntegrationSource(Integration integration, ImmutableIntegrationSpec.Builder builder) throws IOException {
+        final String json = extractIntegrationJson(integration);
+        final String content = compress ? CamelKSupport.compress(json) : json;
+        final String name = integration.getId().get();
+
+        logInfo(integration,"integration.json: {}", content);
+
+        builder.addSources(new SourceSpec.Builder()
+            .compression(compress)
+            .content(content)
+            .language("syndesis")
+            .name(Names.sanitize(name))
+            .build());
+    }
+
+    private void addMappingRules(Integration integration, ImmutableIntegrationSpec.Builder builder) throws IOException {
+        final List<Flow> flows = integration.getFlows();
+        for (int f = 0; f < flows.size(); f++) {
+            final Flow flow = flows.get(f);
+            final List<Step> steps = flow.getSteps();
+
+            for (int s = 0; s < steps.size(); s++) {
+                final Step step = steps.get(s);
+
+                if (StepKind.mapper == step.getStepKind()) {
+                    final Map<String, String> properties = step.getConfiguredProperties();
+                    final String name = "mapping-flow-" + f + "-step-"  + s + ".json";
+                    final String mapping = properties.get("atlasmapping");
+                    final String content = compress ? CamelKSupport.compress(mapping) : mapping;
+
+                    if (content != null) {
+                        builder.addResources(
+                            new ResourceSpec.Builder()
+                                .compression(compress)
+                                .name(Names.sanitize(name))
+                                .content(content)
+                                .type("data")
+                            .build()
+                        );
+                    }
+                }
+            }
+        }
+    }
+
+    private void addOpenAPIDefinition(Integration integration, ImmutableIntegrationSpec.Builder builder) throws IOException {
+        // assuming that we have a single swagger definition for the moment
+        Optional<ResourceIdentifier> rid = integration.getResources().stream().filter(Kind.OpenApi::sameAs).findFirst();
+        if (!rid.isPresent()) {
+            return;
+        }
+
+        final ResourceIdentifier openApiResource = rid.get();
+        final Optional<String> maybeOpenApiResourceId = openApiResource.getId();
+        if (!maybeOpenApiResourceId.isPresent()) {
+            return;
+        }
+
+        final String openApiResourceId = maybeOpenApiResourceId.get();
+        Optional<OpenApi> res = resourceManager.loadOpenApiDefinition(openApiResourceId);
+        if (!res.isPresent()) {
+            return;
+        }
+
+        final byte[] openApiBytes = res.get().getDocument();
+        final String content = compress ? CamelKSupport.compress(openApiBytes) : new String(openApiBytes, UTF_8);
+        final String name = openApiResource.name().orElse(maybeOpenApiResourceId.get());
+
+        builder.addResources(
+            new ResourceSpec.Builder()
+                .compression(compress)
+                .name(Names.sanitize(name))
+                .content(content)
+                .type("openapi")
+                .build()
+        );
+    }
+
 }

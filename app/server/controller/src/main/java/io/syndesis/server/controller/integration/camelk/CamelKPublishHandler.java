@@ -16,6 +16,7 @@
 package io.syndesis.server.controller.integration.camelk;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -143,15 +144,27 @@ public class CamelKPublishHandler extends BaseHandler implements StateChangeHand
             return updateViaValidation;
         }
 
-        CustomResourceDefinition integrationCRD = getOpenShiftService().getCRD(CAMEL_K_INTEGRATIONCRD_NAME)
-            .orElseThrow(() -> new IllegalArgumentException("No Camel-k Integration CRD found for name: "+CAMEL_K_INTEGRATIONCRD_NAME));
+        //
+        // Validation
+        //
+
+        if (!integrationDeployment.getUserId().isPresent()) {
+            throw new IllegalStateException("Couldn't find the user of the integration");
+        }
+        if (!integrationDeployment.getIntegrationId().isPresent()) {
+            throw new IllegalStateException("IntegrationDeployment should have an integrationId");
+        }
+
+        CustomResourceDefinition integrationCRD = getCustomResourceDefinition();
 
         if (isBuildFailed(integrationDeployment, integrationCRD)){
             return new StateUpdate(IntegrationDeploymentState.Error, Collections.emptyMap(), "Error");
         }
 
         logInfo(integrationDeployment, "Build started: {}, isRunning: {}, Deployment ready: {}",
-                isBuildStarted(integrationDeployment, integrationCRD), isRunning(integrationDeployment), isReady(integrationDeployment, integrationCRD));
+                isBuildStarted(integrationDeployment, integrationCRD),
+                isRunning(integrationDeployment),
+                isReady(integrationDeployment, integrationCRD));
 
         Map<String, String> stepsDone = new HashMap<>(integrationDeployment.getStepsDone());
 
@@ -193,8 +206,8 @@ public class CamelKPublishHandler extends BaseHandler implements StateChangeHand
     protected io.syndesis.server.controller.integration.camelk.crd.Integration createCamelkIntegration(IntegrationDeployment integrationDeployment) {
         final Integration integration = integrationDeployment.getSpec();
 
-        String username = integrationDeployment.getUserId().orElseThrow(() -> new IllegalStateException("Couldn't find the user of the integration"));
-        String integrationId = integrationDeployment.getIntegrationId().orElseThrow(() -> new IllegalStateException("IntegrationDeployment should have an integrationId"));
+        String username = integrationDeployment.getUserId().get();
+        String integrationId = integrationDeployment.getIntegrationId().get();
         String version = Integer.toString(integrationDeployment.getVersion());
 
         io.syndesis.server.controller.integration.camelk.crd.Integration result = new io.syndesis.server.controller.integration.camelk.crd.Integration();
@@ -263,41 +276,52 @@ public class CamelKPublishHandler extends BaseHandler implements StateChangeHand
 //        deactivatePreviousDeployments(integrationDeployment);
     }
 
-    @SuppressWarnings({"unchecked"})
-    private Optional<String> getCamelkIntegrationPhase(IntegrationDeployment integrationDeployment, CustomResourceDefinition integrationCRD) {
-        io.syndesis.server.controller.integration.camelk.crd.Integration camelkIntegration = getOpenShiftService().getCR(integrationCRD,
-            io.syndesis.server.controller.integration.camelk.crd.Integration.class,
-            IntegrationList.class,
-            DoneableIntegration.class,
-            Names.sanitize(integrationDeployment.getIntegrationId().orElseThrow(() -> new IllegalStateException("Couldn't find the user of the integration")))).get();
-
-        return camelkIntegration == null ? Optional.empty() : Optional.of(camelkIntegration.getStatus().getPhase());
-    }
-
     private boolean isBuildStarted(IntegrationDeployment integrationDeployment, CustomResourceDefinition integrationCRD) {
         logInfo(integrationDeployment, "isBuildStarted");
-        return CAMEL_K_STARTED_STATES.contains(getCamelkIntegrationPhase(integrationDeployment, integrationCRD).orElse(null));
+        return isInPhase(CAMEL_K_STARTED_STATES, integrationDeployment, integrationCRD);
 
     }
 
     private boolean isBuildFailed(IntegrationDeployment integrationDeployment, CustomResourceDefinition integrationCRD) {
         logInfo(integrationDeployment, "isBuildFailed");
-        return CAMEL_K_FAILED_STATES.contains(getCamelkIntegrationPhase(integrationDeployment, integrationCRD).orElse(null));
+        return isInPhase(CAMEL_K_FAILED_STATES, integrationDeployment, integrationCRD);
     }
 
     private boolean isReady(IntegrationDeployment integrationDeployment, CustomResourceDefinition integrationCRD) {
         logInfo(integrationDeployment, "isReady");
-        return CAMEL_K_READY_STATES.contains(getCamelkIntegrationPhase(integrationDeployment, integrationCRD).orElse(null));
+        return isInPhase(CAMEL_K_READY_STATES, integrationDeployment, integrationCRD);
     }
 
     @Override
     protected boolean isRunning(IntegrationDeployment integrationDeployment) {
-        CustomResourceDefinition integrationCRD = getOpenShiftService().getCRD(CAMEL_K_INTEGRATIONCRD_NAME)
-            .orElseThrow(() -> new IllegalArgumentException("No Camel-k Integration CRD found for name: "+CAMEL_K_INTEGRATIONCRD_NAME));
         logInfo(integrationDeployment, "isRunning");
-        return CAMEL_K_RUNNING_STATES.contains(getCamelkIntegrationPhase(integrationDeployment, integrationCRD).orElse(null));
+        return isInPhase(CAMEL_K_RUNNING_STATES, integrationDeployment, getCustomResourceDefinition());
     }
 
+    private CustomResourceDefinition getCustomResourceDefinition() {
+        return getOpenShiftService().getCRD(CAMEL_K_INTEGRATIONCRD_NAME).orElseThrow(
+            () -> new IllegalArgumentException("No Camel-k Integration CRD found for name: " + CAMEL_K_INTEGRATIONCRD_NAME)
+        );
+    }
+
+    @SuppressWarnings("unchecked")
+    private boolean isInPhase(Collection<String> phases, IntegrationDeployment integrationDeployment, CustomResourceDefinition integrationCRD) {
+        io.syndesis.server.controller.integration.camelk.crd.Integration camelkIntegration = (io.syndesis.server.controller.integration.camelk.crd.Integration)getOpenShiftService().getCR(
+            integrationCRD,
+            io.syndesis.server.controller.integration.camelk.crd.Integration.class,
+            IntegrationList.class,
+            DoneableIntegration.class,
+            Names.sanitize(integrationDeployment.getIntegrationId().get())
+        ).get();
+
+        return camelkIntegration == null ? false : phases.contains(camelkIntegration.getStatus().getPhase());
+    }
+
+    // ************************************
+    //
+    // Add resources to Integration Spec
+    //
+    // ************************************
 
     private void addIntegrationSource(Integration integration, ImmutableIntegrationSpec.Builder builder) throws IOException {
         final String json = extractIntegrationJson(integration);

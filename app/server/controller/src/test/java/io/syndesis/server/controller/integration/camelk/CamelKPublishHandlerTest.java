@@ -110,7 +110,7 @@ public class CamelKPublishHandlerTest {
         assertThat(secret.getMetadata()).hasFieldOrPropertyWithValue("name", integration.getId().get());
         assertThat(secret.getData()).containsKeys("application.properties");
 
-        Properties actual = CamelKSupport.secretToPropertiers(secret);
+        Properties actual = CamelKSupport.secretToProperties(secret);
         Properties expected = generator.generateApplicationProperties(integration);
 
         assertThat(actual).isEqualTo(expected);

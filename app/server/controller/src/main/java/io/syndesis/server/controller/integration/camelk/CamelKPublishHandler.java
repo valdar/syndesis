@@ -184,7 +184,7 @@ public class CamelKPublishHandler extends BaseHandler implements StateChangeHand
             .withNewMetadata()
                 .withName(Names.sanitize(integration.getId().get()))
             .endMetadata()
-            .withData(Collections.singletonMap("application.properties", CamelKSupport.propsToString(applicationProperties)))
+            .addToStringData("application.properties", CamelKSupport.propsToString(applicationProperties))
             .build();
 
         return secret;
@@ -226,7 +226,6 @@ public class CamelKPublishHandler extends BaseHandler implements StateChangeHand
         getDependencies(integration).forEach( gav -> integratinSpecBuilder.addDependencies("mvn:"+gav.getId()));
         integratinSpecBuilder.addDependencies("mvn:io.syndesis.integration:integration-runtime-camelk:"+versionService.getVersion());
 
-
         try {
             addMappingRules(integration, integratinSpecBuilder);
             addOpenAPIDefinition(integration, integratinSpecBuilder);
@@ -266,11 +265,12 @@ public class CamelKPublishHandler extends BaseHandler implements StateChangeHand
 
     @SuppressWarnings({"unchecked"})
     private Optional<String> getCamelkIntegrationPhase(IntegrationDeployment integrationDeployment, CustomResourceDefinition integrationCRD) {
-        io.syndesis.server.controller.integration.camelk.crd.Integration camelkIntegration = ((io.syndesis.server.controller.integration.camelk.crd.Integration) getOpenShiftService().getCR(integrationCRD,
+        io.syndesis.server.controller.integration.camelk.crd.Integration camelkIntegration = getOpenShiftService().getCR(integrationCRD,
             io.syndesis.server.controller.integration.camelk.crd.Integration.class,
             IntegrationList.class,
             DoneableIntegration.class,
-            Names.sanitize(integrationDeployment.getIntegrationId().orElseThrow(() -> new IllegalStateException("Couldn't find the user of the integration")))).get());
+            Names.sanitize(integrationDeployment.getIntegrationId().orElseThrow(() -> new IllegalStateException("Couldn't find the user of the integration")))).get();
+
         return camelkIntegration == null ? Optional.empty() : Optional.of(camelkIntegration.getStatus().getPhase());
     }
 

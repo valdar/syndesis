@@ -17,6 +17,7 @@ package io.syndesis.server.controller.integration.camelk;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.Properties;
@@ -57,6 +58,7 @@ public final class CamelKSupport {
         if (data == null) {
             return "";
         }
+
         try {
             StringWriter w = new StringWriter();
             data.store(w, "");
@@ -66,19 +68,21 @@ public final class CamelKSupport {
         }
     }
 
-    public static Properties secretToPropertiers(Secret secret) {
+    public static Properties secretToProperties(Secret secret) {
         Properties properties = new Properties();
         if (secret == null) {
             return properties;
         }
-        if (!secret.getData().containsKey("application.properties")) {
+
+        String data = secret.getStringData().get("application.properties");
+        if (data == null) {
             return properties;
         }
 
-        try {
-            properties.load(new StringReader(secret.getData().get("application.properties")));
+        try(Reader reader = new StringReader(data)) {
+            properties.load(reader);
         } catch (IOException e) {
-           // ignore
+            throw SyndesisServerException.launderThrowable(e);
         }
 
         return properties;

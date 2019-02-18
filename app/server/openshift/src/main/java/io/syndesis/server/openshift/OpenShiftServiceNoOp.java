@@ -127,5 +127,6 @@ public class OpenShiftServiceNoOp implements OpenShiftService {
 
     @Override
     public void createOrReplaceSecret(Secret secret) {
+        // ... to make PMD happy
     }
 }

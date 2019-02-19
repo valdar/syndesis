@@ -31,7 +31,6 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectWriter;
-import com.google.common.collect.ImmutableSet;
 import io.fabric8.kubernetes.api.model.Secret;
 import io.fabric8.kubernetes.api.model.SecretBuilder;
 import io.fabric8.kubernetes.api.model.apiextensions.CustomResourceDefinition;
@@ -60,6 +59,7 @@ import io.syndesis.server.controller.integration.camelk.crd.DoneableIntegration;
 import io.syndesis.server.controller.integration.camelk.crd.ImmutableIntegrationSpec;
 import io.syndesis.server.controller.integration.camelk.crd.IntegrationList;
 import io.syndesis.server.controller.integration.camelk.crd.IntegrationSpec;
+import io.syndesis.server.controller.integration.camelk.crd.IntegrationTraitSpec;
 import io.syndesis.server.controller.integration.camelk.crd.ResourceSpec;
 import io.syndesis.server.controller.integration.camelk.crd.SourceSpec;
 import io.syndesis.server.dao.IntegrationDao;
@@ -75,40 +75,6 @@ import org.springframework.stereotype.Component;
 @ConditionalOnProperty(value = "controllers.integration", havingValue = "camel-k")
 public class CamelKPublishHandler extends BaseHandler implements StateChangeHandler {
 
-//    // IntegrationPhaseInitial --
-//    IntegrationPhaseInitial IntegrationPhase = ""
-//    // IntegrationPhaseWaitingForPlatform --
-//    IntegrationPhaseWaitingForPlatform IntegrationPhase = "Waiting For Platform"
-//    // IntegrationPhaseBuildingContext --
-//    IntegrationPhaseBuildingContext IntegrationPhase = "Building Context"
-//    // IntegrationPhaseBuildImageSubmitted --
-//    IntegrationPhaseBuildImageSubmitted IntegrationPhase = "Build Image Submitted"
-//    // IntegrationPhaseBuildImageRunning --
-//    IntegrationPhaseBuildImageRunning IntegrationPhase = "Build Image Running"
-//    // IntegrationPhaseDeploying --
-//    IntegrationPhaseDeploying IntegrationPhase = "Deploying"
-//    // IntegrationPhaseRunning --
-//    IntegrationPhaseRunning IntegrationPhase = "Running"
-//    // IntegrationPhaseError --
-//    IntegrationPhaseError IntegrationPhase = "Error"
-//    // IntegrationPhaseBuildFailureRecovery --
-//    IntegrationPhaseBuildFailureRecovery IntegrationPhase = "Building Failure Recovery"
-    private static final String CAMEL_K_INTEGRATIONCRD_NAME = "integrations.camel.apache.org";
-    private static final ImmutableSet<String> CAMEL_K_STARTED_STATES = ImmutableSet.of(
-        "Waiting For Platform",
-        "Building Context",
-        "Build Image Submitted",
-        "Build Image Running",
-        "Deploying");
-    private static final ImmutableSet<String> CAMEL_K_FAILED_STATES = ImmutableSet.of(
-        "Error",
-        "Building Failure Recovery");
-    private static final ImmutableSet<String> CAMEL_K_READY_STATES = ImmutableSet.of(
-        "Running"
-    );
-    private static final ImmutableSet<String> CAMEL_K_RUNNING_STATES = ImmutableSet.of(
-        "Running"
-    );
     private final IntegrationResourceManager resourceManager;
     private final IntegrationProjectGenerator projectGenerator;
     private final VersionService versionService;
@@ -234,6 +200,13 @@ public class CamelKPublishHandler extends BaseHandler implements StateChangeHand
             .type("secret")
             .value(Names.sanitize(integration.getId().get()))
             .build());
+        integratinSpecBuilder.putTraits(
+            "camel",
+            new IntegrationTraitSpec.Builder()
+                //TODO: this should be provided by the VersionService
+                .putConfiguration("version", "2.21.0.fuse-730042")
+                .build()
+        );
 
         //add dependencies
         getDependencies(integration).forEach( gav -> integratinSpecBuilder.addDependencies("mvn:"+gav.getId()));
@@ -278,29 +251,29 @@ public class CamelKPublishHandler extends BaseHandler implements StateChangeHand
 
     private boolean isBuildStarted(IntegrationDeployment integrationDeployment, CustomResourceDefinition integrationCRD) {
         logInfo(integrationDeployment, "isBuildStarted");
-        return isInPhase(CAMEL_K_STARTED_STATES, integrationDeployment, integrationCRD);
+        return isInPhase(CamelKSupport.CAMEL_K_STARTED_STATES, integrationDeployment, integrationCRD);
 
     }
 
     private boolean isBuildFailed(IntegrationDeployment integrationDeployment, CustomResourceDefinition integrationCRD) {
         logInfo(integrationDeployment, "isBuildFailed");
-        return isInPhase(CAMEL_K_FAILED_STATES, integrationDeployment, integrationCRD);
+        return isInPhase(CamelKSupport.CAMEL_K_FAILED_STATES, integrationDeployment, integrationCRD);
     }
 
     private boolean isReady(IntegrationDeployment integrationDeployment, CustomResourceDefinition integrationCRD) {
         logInfo(integrationDeployment, "isReady");
-        return isInPhase(CAMEL_K_READY_STATES, integrationDeployment, integrationCRD);
+        return isInPhase(CamelKSupport.CAMEL_K_READY_STATES, integrationDeployment, integrationCRD);
     }
 
     @Override
     protected boolean isRunning(IntegrationDeployment integrationDeployment) {
         logInfo(integrationDeployment, "isRunning");
-        return isInPhase(CAMEL_K_RUNNING_STATES, integrationDeployment, getCustomResourceDefinition());
+        return isInPhase(CamelKSupport.CAMEL_K_RUNNING_STATES, integrationDeployment, getCustomResourceDefinition());
     }
 
     private CustomResourceDefinition getCustomResourceDefinition() {
-        return getOpenShiftService().getCRD(CAMEL_K_INTEGRATIONCRD_NAME).orElseThrow(
-            () -> new IllegalArgumentException("No Camel-k Integration CRD found for name: " + CAMEL_K_INTEGRATIONCRD_NAME)
+        return getOpenShiftService().getCRD(CamelKSupport.CAMEL_K_INTEGRATION_CRD_NAME).orElseThrow(
+            () -> new IllegalArgumentException("No Camel-k Integration CRD found for name: " + CamelKSupport.CAMEL_K_INTEGRATION_CRD_NAME)
         );
     }
 

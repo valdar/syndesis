@@ -205,23 +205,4 @@
     </profile>
   </profiles>
 
-  <!--XXX: temporary exclusion for camel-k snapshots -->
-  <build>
-    <plugins>
-      <plugin>
-        <artifactId>maven-dependency-plugin</artifactId>
-        <executions>
-          <execution>
-            <configuration>
-              <ignoredDependencies>
-                <ignoredDependency>com.github.apache.camel-k:camel-k-runtime-core:*</ignoredDependency>
-                <ignoredDependency>com.github.apache:camel-k:*</ignoredDependency>
-              </ignoredDependencies>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
-  </build>
-
 </project>

@@ -75,9 +75,8 @@
     <commons.compress.version>1.18</commons.compress.version>
 
     <!-- Global camel version used everywhere -->
-
     <camel.version>2.21.0.fuse-730049</camel.version>
-    <camel-k.version>0.2.1-SNAPSHOT</camel-k.version>
+    <camel-k.version>0.2.1</camel-k.version>
 
     <dep.plugin.dependency.version>3.0.2</dep.plugin.dependency.version>
     <dep.plugin.pmd.version>3.10.0</dep.plugin.pmd.version>
@@ -2207,6 +2206,16 @@
       <url>https://maven.repository.redhat.com/ga</url>
     </repository>
     <repository>
+      <id>apache.staging</id>
+      <url>https://repository.apache.org/content/repositories/orgapachecamel-1120/</url>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </repository>
+    <repository>
       <id>apache.snapshots</id>
       <url>https://repository.apache.org/content/repositories/snapshots/</url>
       <releases>
@@ -2230,6 +2239,16 @@
       <id>redhat.ga</id>
       <name>Red Hat General Availability Repository</name>
       <url>https://maven.repository.redhat.com/ga</url>
+    </pluginRepository>
+    <pluginRepository>
+      <id>apache.staging</id>
+      <url>https://repository.apache.org/content/repositories/orgapachecamel-1120/</url>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
     </pluginRepository>
     <pluginRepository>
       <id>apache.snapshots</id>

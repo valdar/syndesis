@@ -25,10 +25,46 @@ import java.util.zip.GZIPOutputStream;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
+import com.google.common.collect.ImmutableSet;
 import io.fabric8.kubernetes.api.model.Secret;
 import io.syndesis.common.util.SyndesisServerException;
 
 public final class CamelKSupport {
+    //    // IntegrationPhaseInitial --
+    //    IntegrationPhaseInitial IntegrationPhase = ""
+    //    // IntegrationPhaseWaitingForPlatform --
+    //    IntegrationPhaseWaitingForPlatform IntegrationPhase = "Waiting For Platform"
+    //    // IntegrationPhaseBuildingContext --
+    //    IntegrationPhaseBuildingContext IntegrationPhase = "Building Context"
+    //    // IntegrationPhaseBuildImageSubmitted --
+    //    IntegrationPhaseBuildImageSubmitted IntegrationPhase = "Build Image Submitted"
+    //    // IntegrationPhaseBuildImageRunning --
+    //    IntegrationPhaseBuildImageRunning IntegrationPhase = "Build Image Running"
+    //    // IntegrationPhaseDeploying --
+    //    IntegrationPhaseDeploying IntegrationPhase = "Deploying"
+    //    // IntegrationPhaseRunning --
+    //    IntegrationPhaseRunning IntegrationPhase = "Running"
+    //    // IntegrationPhaseError --
+    //    IntegrationPhaseError IntegrationPhase = "Error"
+    //    // IntegrationPhaseBuildFailureRecovery --
+    //    IntegrationPhaseBuildFailureRecovery IntegrationPhase = "Building Failure Recovery"
+
+    public static final ImmutableSet<String> CAMEL_K_STARTED_STATES = ImmutableSet.of(
+                "Waiting For Platform",
+                "Building Context",
+                "Build Image Submitted",
+                "Build Image Running",
+                "Deploying");
+    public static final ImmutableSet<String> CAMEL_K_FAILED_STATES = ImmutableSet.of(
+                "Error",
+                "Building Failure Recovery");
+    public static final ImmutableSet<String> CAMEL_K_READY_STATES = ImmutableSet.of(
+                "Running");
+    public static final ImmutableSet<String> CAMEL_K_RUNNING_STATES = ImmutableSet.of(
+                "Running" );
+
+    public static final String CAMEL_K_INTEGRATION_CRD_NAME = "integrations.camel.apache.org";
+
     private CamelKSupport() {
     }
 

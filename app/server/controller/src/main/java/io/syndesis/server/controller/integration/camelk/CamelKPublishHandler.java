@@ -189,18 +189,18 @@ public class CamelKPublishHandler extends BaseHandler implements StateChangeHand
         result.getMetadata().getAnnotations().put(OpenShiftService.INTEGRATION_ID_LABEL, integrationId);
         result.getMetadata().getAnnotations().put(OpenShiftService.DEPLOYMENT_VERSION_LABEL, version);
 
-        ImmutableIntegrationSpec.Builder integratinSpecBuilder = new IntegrationSpec.Builder();
+        ImmutableIntegrationSpec.Builder integrationSpecBuilder = new IntegrationSpec.Builder();
 
         //add customizers
-        integratinSpecBuilder.addConfiguration(new ConfigurationSpec.Builder()
+        integrationSpecBuilder.addConfiguration(new ConfigurationSpec.Builder()
             .type("property")
             .value("camel.k.customizer=metadata,logging")
             .build());
-        integratinSpecBuilder.addConfiguration(new ConfigurationSpec.Builder()
+        integrationSpecBuilder.addConfiguration(new ConfigurationSpec.Builder()
             .type("secret")
             .value(Names.sanitize(integration.getId().get()))
             .build());
-        integratinSpecBuilder.putTraits(
+        integrationSpecBuilder.putTraits(
             "camel",
             new IntegrationTraitSpec.Builder()
                 //TODO: this should be provided by the VersionService
@@ -209,18 +209,18 @@ public class CamelKPublishHandler extends BaseHandler implements StateChangeHand
         );
 
         //add dependencies
-        getDependencies(integration).forEach( gav -> integratinSpecBuilder.addDependencies("mvn:"+gav.getId()));
-        integratinSpecBuilder.addDependencies("mvn:io.syndesis.integration:integration-runtime-camelk:"+versionService.getVersion());
+        getDependencies(integration).forEach( gav -> integrationSpecBuilder.addDependencies("mvn:"+gav.getId()));
+        integrationSpecBuilder.addDependencies("mvn:io.syndesis.integration:integration-runtime-camelk:"+versionService.getVersion());
 
         try {
-            addMappingRules(integration, integratinSpecBuilder);
-            addOpenAPIDefinition(integration, integratinSpecBuilder);
-            addIntegrationSource(integration, integratinSpecBuilder);
+            addMappingRules(integration, integrationSpecBuilder);
+            addOpenAPIDefinition(integration, integrationSpecBuilder);
+            addIntegrationSource(integration, integrationSpecBuilder);
         } catch (IOException e) {
             throw new IllegalStateException(e);
         }
 
-        result.setSpec(integratinSpecBuilder.build());
+        result.setSpec(integrationSpecBuilder.build());
         return result;
     }
 

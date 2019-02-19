@@ -314,7 +314,7 @@ public class CamelKPublishHandler extends BaseHandler implements StateChangeHand
             Names.sanitize(integrationDeployment.getIntegrationId().get())
         ).get();
 
-        return camelkIntegration == null ? false : phases.contains(camelkIntegration.getStatus().getPhase());
+        return camelkIntegration != null && phases.contains(camelkIntegration.getStatus().getPhase());
     }
 
     // ************************************

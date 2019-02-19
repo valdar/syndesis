@@ -145,6 +145,36 @@
 
   </dependencies>
 
+  <build>
+    <plugins>
+      <plugin>
+          <groupId>org.apache.camel.k</groupId>
+          <artifactId>camel-k-maven-plugin</artifactId>
+          <version>${camel-k.version}</version>
+          <executions>
+              <execution>
+                  <id>generate-catalog</id>
+                  <phase>initialize</phase>
+                  <goals>
+                      <goal>generate-catalog</goal>
+                  </goals>
+              </execution>
+          </executions>
+          <configuration>
+            <outputPath>${project.basedir}/src/main/resources/META-INF/catalog/</outputPath>
+            <outputFile>camel-catalog-${camel.version}.yaml</outputFile>
+          </configuration>
+          <dependencies>
+              <dependency>
+                  <groupId>org.apache.camel</groupId>
+                  <artifactId>camel-catalog</artifactId>
+                  <version>${camel.version}</version>
+              </dependency>
+          </dependencies>
+      </plugin>
+    </plugins>
+  </build>
+
   <profiles>
     <profile>
       <id>dependency-prepare</id>

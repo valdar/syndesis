@@ -76,7 +76,7 @@
 
     <!-- Global camel version used everywhere -->
     <camel.version>2.21.0.fuse-730049</camel.version>
-    <camel-k.version>0.2.1</camel-k.version>
+    <camel-k.version>0.3.0-SNAPSHOT</camel-k.version>
 
     <dep.plugin.dependency.version>3.0.2</dep.plugin.dependency.version>
     <dep.plugin.pmd.version>3.10.0</dep.plugin.pmd.version>
@@ -621,6 +621,7 @@
               <exclude>extension/**/src/it/**/verify.groovy</exclude>
               <!-- excludes as it is copied from upstream camel component and nneds to be moved back to caml -->
               <exclude>connector/servicenow/src/main/java/io/syndesis/connector/servicenow/ServiceNowMetaDataExtension.java</exclude>
+              <exclude>integration/runtime-camelk/src/main/resources/META-INF/catalog/**</exclude>
             </excludes>
           </configuration>
           <dependencies>

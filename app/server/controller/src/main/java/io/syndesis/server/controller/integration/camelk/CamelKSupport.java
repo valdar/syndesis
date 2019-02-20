@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.util.Collection;
 import java.util.Properties;
 import java.util.zip.GZIPOutputStream;
 
@@ -27,7 +28,13 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 
 import com.google.common.collect.ImmutableSet;
 import io.fabric8.kubernetes.api.model.Secret;
+import io.syndesis.common.model.integration.IntegrationDeployment;
+import io.syndesis.common.model.integration.IntegrationDeploymentState;
+import io.syndesis.common.util.Names;
 import io.syndesis.common.util.SyndesisServerException;
+import io.syndesis.server.controller.integration.camelk.crd.DoneableIntegration;
+import io.syndesis.server.controller.integration.camelk.crd.IntegrationList;
+import io.syndesis.server.openshift.OpenShiftService;
 
 public final class CamelKSupport {
     //    // IntegrationPhaseInitial --
@@ -58,8 +65,6 @@ public final class CamelKSupport {
     public static final ImmutableSet<String> CAMEL_K_FAILED_STATES = ImmutableSet.of(
                 "Error",
                 "Building Failure Recovery");
-    public static final ImmutableSet<String> CAMEL_K_READY_STATES = ImmutableSet.of(
-                "Running");
     public static final ImmutableSet<String> CAMEL_K_RUNNING_STATES = ImmutableSet.of(
                 "Running" );
 
@@ -122,5 +127,59 @@ public final class CamelKSupport {
         }
 
         return properties;
+    }
+
+    @SuppressWarnings("unchecked")
+    public static io.syndesis.server.controller.integration.camelk.crd.Integration getIntegrationCR(
+            OpenShiftService openShiftService,
+            io.fabric8.kubernetes.api.model.apiextensions.CustomResourceDefinition integrationCRD,
+            IntegrationDeployment integrationDeployment) {
+
+        return (io.syndesis.server.controller.integration.camelk.crd.Integration)openShiftService.getCR(
+            integrationCRD,
+            io.syndesis.server.controller.integration.camelk.crd.Integration.class,
+            IntegrationList.class,
+            DoneableIntegration.class,
+            Names.sanitize(integrationDeployment.getIntegrationId().get())
+        ).get();
+    }
+
+    public static io.fabric8.kubernetes.api.model.apiextensions.CustomResourceDefinition getCustomResourceDefinition(OpenShiftService openShiftService) {
+        return openShiftService.getCRD(CamelKSupport.CAMEL_K_INTEGRATION_CRD_NAME).orElseThrow(
+            () -> new IllegalArgumentException("No Camel-k Integration CRD found for name: " + CamelKSupport.CAMEL_K_INTEGRATION_CRD_NAME)
+        );
+    }
+
+    public static boolean isBuildStarted(io.syndesis.server.controller.integration.camelk.crd.Integration integration) {
+        return isInPhase(integration, CamelKSupport.CAMEL_K_STARTED_STATES);
+
+    }
+
+    public static boolean isBuildFailed(io.syndesis.server.controller.integration.camelk.crd.Integration integration) {
+        return isInPhase(integration, CamelKSupport.CAMEL_K_FAILED_STATES);
+    }
+
+    public static boolean isRunning(io.syndesis.server.controller.integration.camelk.crd.Integration integration) {
+        return isInPhase(integration, CamelKSupport.CAMEL_K_RUNNING_STATES);
+    }
+
+    public static boolean isInPhase(io.syndesis.server.controller.integration.camelk.crd.Integration integration, Collection<String> phases) {
+        return integration != null && phases.contains(integration.getStatus().getPhase());
+    }
+
+    public static IntegrationDeploymentState getState(io.syndesis.server.controller.integration.camelk.crd.Integration integration) {
+        if (integration != null) {
+            if (CamelKSupport.isBuildFailed(integration)) {
+                return IntegrationDeploymentState.Error;
+            }
+            if (CamelKSupport.isBuildStarted(integration)) {
+                return IntegrationDeploymentState.Pending;
+            }
+            if (CamelKSupport.isRunning(integration)) {
+                return IntegrationDeploymentState.Published;
+            }
+        }
+
+        return IntegrationDeploymentState.Unpublished;
     }
 }

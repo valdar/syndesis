@@ -521,10 +521,17 @@ public class OpenShiftServiceImpl implements OpenShiftService {
         return result != null ? Optional.of(result) : Optional.empty();
     }
 
+
+    @Override
+    @SuppressWarnings({"unchecked"})
+    public <T extends HasMetadata, L extends KubernetesResourceList<T>, D extends Doneable<T>> boolean deleteCR(CustomResourceDefinition crd, Class<T> resourceType, Class<L> resourceListType, Class<D> doneableResourceType, T customResource){
+        return getCRDClient(crd, resourceType, resourceListType, doneableResourceType).inNamespace(config.getNamespace()).delete(customResource);
+    }
+
     @Override
     @SuppressWarnings({"unchecked"})
     public <T extends HasMetadata, L extends KubernetesResourceList<T>, D extends Doneable<T>> T createOrReplaceCR(CustomResourceDefinition crd, Class<T> resourceType, Class<L> resourceListType, Class<D> doneableResourceType, T customResource){
-       return getCRDClient(crd, resourceType, resourceListType, doneableResourceType).inNamespace(config.getNamespace()).createOrReplace(customResource);
+        return getCRDClient(crd, resourceType, resourceListType, doneableResourceType).inNamespace(config.getNamespace()).createOrReplace(customResource);
     }
 
     @Override

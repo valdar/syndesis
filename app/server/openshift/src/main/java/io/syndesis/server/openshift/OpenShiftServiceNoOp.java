@@ -64,6 +64,11 @@ public class OpenShiftServiceNoOp implements OpenShiftService {
 
 
     @Override
+    public <T extends HasMetadata, L extends KubernetesResourceList<T>, D extends Doneable<T>> boolean deleteCR(CustomResourceDefinition crd, Class<T> resourceType, Class<L> resourceListType, Class<D> doneableResourceType, T customResource) {
+        return false;
+    }
+
+    @Override
     public String build(String name, DeploymentData data, InputStream tarInputStream) {
         // Empty no-op just for testing
         return null;

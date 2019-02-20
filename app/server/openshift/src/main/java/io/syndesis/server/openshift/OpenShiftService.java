@@ -163,6 +163,20 @@ public interface OpenShiftService {
     Optional<CustomResourceDefinition> getCRD(String crdName);
 
     /**
+     * Delete the given CR.
+     *
+     * @param <T>   The Kubernetes resource type.
+     * @param <L>   The list variant of the Kubernetes resource type.
+     * @param <D>   The doneable variant of the Kubernetes resource type.
+     * @param crd the {@link CustomResourceDefinition}
+     * @param resourceType the type of T
+     * @param resourceListType the type of L
+     * @param doneableResourceType the type of D
+     * @param customResource the {@link io.fabric8.kubernetes.client.CustomResource} myst be of type T
+     */
+    <T extends HasMetadata, L extends KubernetesResourceList<T>, D extends Doneable<T>> boolean deleteCR(CustomResourceDefinition crd, Class<T> resourceType, Class<L> resourceListType, Class<D> doneableResourceType, T customResource);
+
+    /**
      * The entry point to client operations.
      * @param <T>   The Kubernetes resource type.
      * @param <L>   The list variant of the Kubernetes resource type.

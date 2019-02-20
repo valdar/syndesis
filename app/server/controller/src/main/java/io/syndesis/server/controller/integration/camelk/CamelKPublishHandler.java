@@ -16,7 +16,6 @@
 package io.syndesis.server.controller.integration.camelk;
 
 import java.io.IOException;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -52,7 +51,6 @@ import io.syndesis.integration.api.IntegrationResourceManager;
 import io.syndesis.integration.project.generator.mvn.MavenGav;
 import io.syndesis.server.controller.StateChangeHandler;
 import io.syndesis.server.controller.StateUpdate;
-import io.syndesis.server.controller.integration.BaseHandler;
 import io.syndesis.server.controller.integration.IntegrationPublishValidator;
 import io.syndesis.server.controller.integration.camelk.crd.ConfigurationSpec;
 import io.syndesis.server.controller.integration.camelk.crd.DoneableIntegration;
@@ -73,7 +71,7 @@ import org.springframework.stereotype.Component;
 @Component
 @Qualifier("camel-k")
 @ConditionalOnProperty(value = "controllers.integration", havingValue = "camel-k")
-public class CamelKPublishHandler extends BaseHandler implements StateChangeHandler {
+public class CamelKPublishHandler extends BaseCamelKHandler implements StateChangeHandler {
 
     private final IntegrationResourceManager resourceManager;
     private final IntegrationProjectGenerator projectGenerator;
@@ -81,13 +79,14 @@ public class CamelKPublishHandler extends BaseHandler implements StateChangeHand
 
     private boolean compress;
 
-    public CamelKPublishHandler(OpenShiftService openShiftService,
-                                IntegrationDao iDao,
-                                IntegrationDeploymentDao idDao,
-                                IntegrationProjectGenerator projectGenerator,
-                                IntegrationPublishValidator validator,
-                                IntegrationResourceManager resourceManager,
-                                VersionService versionService) {
+    public CamelKPublishHandler(
+            OpenShiftService openShiftService,
+            IntegrationDao iDao,
+            IntegrationDeploymentDao idDao,
+            IntegrationProjectGenerator projectGenerator,
+            IntegrationPublishValidator validator,
+            IntegrationResourceManager resourceManager,
+            VersionService versionService) {
         super(openShiftService, iDao, idDao, validator);
         this.projectGenerator = projectGenerator;
         this.resourceManager = resourceManager;
@@ -103,7 +102,6 @@ public class CamelKPublishHandler extends BaseHandler implements StateChangeHand
     }
 
     @Override
-    @SuppressWarnings({"unchecked"})
     public StateUpdate execute(IntegrationDeployment integrationDeployment) {
         StateUpdate updateViaValidation = getValidator().validate(integrationDeployment);
         if (updateViaValidation != null) {
@@ -123,37 +121,46 @@ public class CamelKPublishHandler extends BaseHandler implements StateChangeHand
 
         CustomResourceDefinition integrationCRD = getCustomResourceDefinition();
 
-        if (isBuildFailed(integrationDeployment, integrationCRD)){
-            return new StateUpdate(IntegrationDeploymentState.Error, Collections.emptyMap(), "Error");
+        if (isBuildFailed(integrationDeployment, integrationCRD)) {
+            logInfo(integrationDeployment, "Build Failed");
+            return new StateUpdate(IntegrationDeploymentState.Error, Collections.emptyMap(), "Build Failed");
+        }
+        if (isBuildStarted(integrationDeployment, integrationCRD)) {
+            logInfo(integrationDeployment, "Build Started");
+            return new StateUpdate(IntegrationDeploymentState.Pending, Collections.emptyMap(), "Build Started");
+        }
+        if (isRunning(integrationDeployment, integrationCRD)) {
+            logInfo(integrationDeployment, "Running");
+            return new StateUpdate(IntegrationDeploymentState.Published, Collections.emptyMap(), "Running");
         }
 
-        logInfo(integrationDeployment, "Build started: {}, isRunning: {}, Deployment ready: {}",
-                isBuildStarted(integrationDeployment, integrationCRD),
-                isRunning(integrationDeployment),
-                isReady(integrationDeployment, integrationCRD));
+        return createIntegration(integrationDeployment, integrationCRD);
+    }
 
+    @SuppressWarnings({"unchecked"})
+    protected StateUpdate createIntegration(IntegrationDeployment integrationDeployment, CustomResourceDefinition integrationCRD) {
         Map<String, String> stepsDone = new HashMap<>(integrationDeployment.getStepsDone());
 
         logInfo(integrationDeployment,"Creating Camel-K resource");
 
         prepareDeployment(integrationDeployment);
 
-        io.syndesis.server.controller.integration.camelk.crd.Integration camelkIntegration = createCamelkIntegration(integrationDeployment);
-        Secret camelkSecrets = createCamelkIntegrationSecret(integrationDeployment);
+        io.syndesis.server.controller.integration.camelk.crd.Integration camelkIntegration = createIntegrationCR(integrationDeployment);
+        Secret camelkSecrets = createIntegrationSecret(integrationDeployment);
 
         getOpenShiftService().createOrReplaceSecret(camelkSecrets);
         getOpenShiftService().createOrReplaceCR(integrationCRD,
-                                                io.syndesis.server.controller.integration.camelk.crd.Integration.class,
-                                                IntegrationList.class,
-                                                DoneableIntegration.class,
-                                                camelkIntegration);
+            io.syndesis.server.controller.integration.camelk.crd.Integration.class,
+            IntegrationList.class,
+            DoneableIntegration.class,
+            camelkIntegration);
         stepsDone.put("deploy", "camel-k");
         logInfo(integrationDeployment,"Camel-K resource created");
 
         return new StateUpdate(IntegrationDeploymentState.Pending, stepsDone);
     }
 
-    protected Secret createCamelkIntegrationSecret(IntegrationDeployment integrationDeployment) {
+    protected Secret createIntegrationSecret(IntegrationDeployment integrationDeployment) {
         final Integration integration = integrationDeployment.getSpec();
 
         Properties applicationProperties = projectGenerator.generateApplicationProperties(integration);
@@ -169,7 +176,7 @@ public class CamelKPublishHandler extends BaseHandler implements StateChangeHand
         return secret;
     }
 
-    protected io.syndesis.server.controller.integration.camelk.crd.Integration createCamelkIntegration(IntegrationDeployment integrationDeployment) {
+    protected io.syndesis.server.controller.integration.camelk.crd.Integration createIntegrationCR(IntegrationDeployment integrationDeployment) {
         final Integration integration = integrationDeployment.getSpec();
 
         String username = integrationDeployment.getUserId().get();
@@ -247,47 +254,6 @@ public class CamelKPublishHandler extends BaseHandler implements StateChangeHand
     private void prepareDeployment(IntegrationDeployment integrationDeployment) {
         setVersion(integrationDeployment);
 //        deactivatePreviousDeployments(integrationDeployment);
-    }
-
-    private boolean isBuildStarted(IntegrationDeployment integrationDeployment, CustomResourceDefinition integrationCRD) {
-        logInfo(integrationDeployment, "isBuildStarted");
-        return isInPhase(CamelKSupport.CAMEL_K_STARTED_STATES, integrationDeployment, integrationCRD);
-
-    }
-
-    private boolean isBuildFailed(IntegrationDeployment integrationDeployment, CustomResourceDefinition integrationCRD) {
-        logInfo(integrationDeployment, "isBuildFailed");
-        return isInPhase(CamelKSupport.CAMEL_K_FAILED_STATES, integrationDeployment, integrationCRD);
-    }
-
-    private boolean isReady(IntegrationDeployment integrationDeployment, CustomResourceDefinition integrationCRD) {
-        logInfo(integrationDeployment, "isReady");
-        return isInPhase(CamelKSupport.CAMEL_K_READY_STATES, integrationDeployment, integrationCRD);
-    }
-
-    @Override
-    protected boolean isRunning(IntegrationDeployment integrationDeployment) {
-        logInfo(integrationDeployment, "isRunning");
-        return isInPhase(CamelKSupport.CAMEL_K_RUNNING_STATES, integrationDeployment, getCustomResourceDefinition());
-    }
-
-    private CustomResourceDefinition getCustomResourceDefinition() {
-        return getOpenShiftService().getCRD(CamelKSupport.CAMEL_K_INTEGRATION_CRD_NAME).orElseThrow(
-            () -> new IllegalArgumentException("No Camel-k Integration CRD found for name: " + CamelKSupport.CAMEL_K_INTEGRATION_CRD_NAME)
-        );
-    }
-
-    @SuppressWarnings("unchecked")
-    private boolean isInPhase(Collection<String> phases, IntegrationDeployment integrationDeployment, CustomResourceDefinition integrationCRD) {
-        io.syndesis.server.controller.integration.camelk.crd.Integration camelkIntegration = (io.syndesis.server.controller.integration.camelk.crd.Integration)getOpenShiftService().getCR(
-            integrationCRD,
-            io.syndesis.server.controller.integration.camelk.crd.Integration.class,
-            IntegrationList.class,
-            DoneableIntegration.class,
-            Names.sanitize(integrationDeployment.getIntegrationId().get())
-        ).get();
-
-        return camelkIntegration != null && phases.contains(camelkIntegration.getStatus().getPhase());
     }
 
     // ************************************

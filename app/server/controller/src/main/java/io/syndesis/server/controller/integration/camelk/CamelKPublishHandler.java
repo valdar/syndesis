@@ -204,7 +204,7 @@ public class CamelKPublishHandler extends BaseHandler implements StateChangeHand
             "camel",
             new IntegrationTraitSpec.Builder()
                 //TODO: this should be provided by the VersionService
-                .putConfiguration("version", "2.21.0.fuse-730042")
+                .putConfiguration("version", "2.21.0.fuse-730049")
                 .build()
         );
 

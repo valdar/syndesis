@@ -75,16 +75,6 @@ public class CamelKUnpublishHandler extends BaseCamelKHandler implements StateCh
             DoneableIntegration.class,
             cr);
 
-        //
-        // Try to delete some leftovers
-        //
-        // TODO: CR operation seems to lack the option to cascade delete all the
-        //       resources associates to the cr (those that have ownerReference
-        //       set to the cr itself) so it leaves the integration running as
-        //       the deployment is not deleted
-        //
-        getOpenShiftService().delete(id);
-
         return deleted
             ? new StateUpdate(IntegrationDeploymentState.Unpublished, Collections.emptyMap())
             : new StateUpdate(CamelKSupport.getState(cr), Collections.emptyMap());

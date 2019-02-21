@@ -16,6 +16,7 @@
 package io.syndesis.server.controller.integration.camelk;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -212,15 +213,22 @@ public class CamelKPublishHandler extends BaseCamelKHandler implements StateChan
             new IntegrationTraitSpec.Builder()
                 //TODO: this should be provided by the VersionService
                 .putConfiguration("version", "2.21.0.fuse-730049")
-                .build()
-        );
-        integrationSpecBuilder.putTraits(
-            "camel",
-            new IntegrationTraitSpec.Builder()
-                //TODO: this should be provided by the VersionService
                 .putConfiguration("runtime-version", "0.2.1")
                 .build()
         );
+
+        //
+        // CR operation seems to lack the option to cascade delete all the
+        // resources associates to the cr (those that have ownerReference
+        // set to the cr itself) so it leaves the integration running as
+        // the deployment is not deleted.
+        //
+        // As workaround, let use finalizers
+        //
+        // TODO: this need to be replaced by a proper impl that support
+        //       cascading
+        //
+        result.getMetadata().setFinalizers(Arrays.asList("finalizer.integration.camel.apache.org"));
 
         //add dependencies
         getDependencies(integration).forEach( gav -> integrationSpecBuilder.addDependencies("mvn:"+gav.getId()));

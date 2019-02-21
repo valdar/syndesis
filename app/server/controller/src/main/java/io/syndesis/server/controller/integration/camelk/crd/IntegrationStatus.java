@@ -36,6 +36,7 @@ public interface IntegrationStatus extends Serializable {
     //    GeneratedSources []SourceSpec     `json:"generatedSources,omitempty"`
     //    Failure          *Failure         `json:"failure,omitempty"`
     //    CamelVersion     string           `json:"camelVersion,omitempty"`
+    //    RuntimeVersion   string           `json:"runtimeVersion,omitempty"`
 
     @Nullable
     String getPhase();
@@ -51,6 +52,8 @@ public interface IntegrationStatus extends Serializable {
     Failure getFailure();
     @Nullable
     String getCamelVersion();
+    @Nullable
+    String getRuntimeVersion();
 
     class Builder extends ImmutableIntegrationStatus.Builder {
     }

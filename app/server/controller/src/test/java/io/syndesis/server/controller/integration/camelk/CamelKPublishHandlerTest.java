@@ -105,7 +105,7 @@ public class CamelKPublishHandlerTest {
             manager,
             new VersionService());
 
-        Secret secret = handler.createCamelkIntegrationSecret(deployment);
+        Secret secret = handler.createIntegrationSecret(deployment);
 
         assertThat(secret.getMetadata()).hasFieldOrPropertyWithValue("name", integration.getId().get());
         assertThat(secret.getData()).containsKeys("application.properties");
@@ -151,7 +151,7 @@ public class CamelKPublishHandlerTest {
             new VersionService());
 
 
-        io.syndesis.server.controller.integration.camelk.crd.Integration i = handler.createCamelkIntegration(deployment);
+        io.syndesis.server.controller.integration.camelk.crd.Integration i = handler.createIntegrationCR(deployment);
 
         assertThat(i.getSpec().getSources()).isNotEmpty();
         assertThat(i.getSpec().getDependencies()).isNotEmpty();

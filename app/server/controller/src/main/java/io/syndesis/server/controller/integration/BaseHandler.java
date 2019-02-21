@@ -24,6 +24,7 @@ import io.syndesis.server.openshift.OpenShiftService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@SuppressWarnings("PMD.LoggerIsNotStaticFinal")
 public class BaseHandler {
 
     private final OpenShiftService openShiftService;

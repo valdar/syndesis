@@ -40,6 +40,7 @@ import io.syndesis.common.model.integration.Scheduler;
 import io.syndesis.common.model.integration.Step;
 import io.syndesis.common.model.integration.step.template.TemplateStepLanguage;
 import io.syndesis.common.model.openapi.OpenApi;
+import io.syndesis.common.util.SuppressFBWarnings;
 import org.apache.commons.lang3.StringUtils;
 
 public interface IntegrationResourceManager {
@@ -97,6 +98,7 @@ public interface IntegrationResourceManager {
         return collectDependencies(integration.getFlows().stream().flatMap(flow -> flow.getSteps().stream()).collect(Collectors.toList()), true);
     }
 
+    @SuppressFBWarnings("NP_NONNULL_PARAM_VIOLATION")
     @SuppressWarnings("PMD.ExcessiveMethodLength")
     default Integration sanitize(Integration integration) {
         if (integration.getFlows().isEmpty()) {

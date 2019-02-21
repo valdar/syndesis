@@ -64,7 +64,6 @@ public class CamelKUnpublishHandler extends BaseCamelKHandler implements StateCh
             throw new IllegalStateException("IntegrationDeployment should have an integrationId");
         }
 
-        String id = integrationDeployment.getIntegrationId().get();
         io.fabric8.kubernetes.api.model.apiextensions.CustomResourceDefinition crd = getCustomResourceDefinition();
         io.syndesis.server.controller.integration.camelk.crd.Integration cr = CamelKSupport.getIntegrationCR(getOpenShiftService(), crd, integrationDeployment);
 

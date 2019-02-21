@@ -64,6 +64,7 @@ public class CamelKUnpublishHandler extends BaseCamelKHandler implements StateCh
             throw new IllegalStateException("IntegrationDeployment should have an integrationId");
         }
 
+        String id = integrationDeployment.getIntegrationId().get();
         io.fabric8.kubernetes.api.model.apiextensions.CustomResourceDefinition crd = getCustomResourceDefinition();
         io.syndesis.server.controller.integration.camelk.crd.Integration cr = CamelKSupport.getIntegrationCR(getOpenShiftService(), crd, integrationDeployment);
 
@@ -73,6 +74,16 @@ public class CamelKUnpublishHandler extends BaseCamelKHandler implements StateCh
             IntegrationList.class,
             DoneableIntegration.class,
             cr);
+
+        //
+        // Try to delete some leftovers
+        //
+        // TODO: CR operation seems to lack the option to cascade delete all the
+        //       resources associates to the cr (those that have ownerReference
+        //       set to the cr itself) so it leaves the integration running as
+        //       the deployment is not deleted
+        //
+        getOpenShiftService().delete(id);
 
         return deleted
             ? new StateUpdate(IntegrationDeploymentState.Unpublished, Collections.emptyMap())

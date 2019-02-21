@@ -144,7 +144,7 @@ public abstract class BaseIntegrationController implements BackendController {
         };
     }
 
-    private void checkIntegrationStatusIfNotAlreadyInProgress(String id) {
+    protected void checkIntegrationStatusIfNotAlreadyInProgress(String id) {
         executor.execute(() -> {
             IntegrationDeployment integrationDeployment = dataManager.fetch(IntegrationDeployment.class, id);
             if( integrationDeployment != null) {
@@ -165,10 +165,9 @@ public abstract class BaseIntegrationController implements BackendController {
 
     private void scanIntegrationsForWork() {
         LOG.info("Checking integrations for their status.");
-        executor.execute(() -> {
-            dataManager.fetchIds(IntegrationDeployment.class).forEach(id -> {
-                checkIntegrationStatusIfNotAlreadyInProgress(id);});
-        });
+        executor.execute(
+            () -> dataManager.fetchIds(IntegrationDeployment.class).forEach(this::checkIntegrationStatusIfNotAlreadyInProgress)
+        );
     }
 
     private void checkIntegrationStatus(IntegrationDeployment integrationDeployment) {
@@ -295,7 +294,7 @@ public abstract class BaseIntegrationController implements BackendController {
         if (actualState == IntegrationDeploymentState.Unpublished && actualState != integrationDeployment.getCurrentState()) {
             return integrationDeployment.unpublished();
         } else {
-          return integrationDeployment.withCurrentState(actualState);
+            return integrationDeployment.withCurrentState(actualState);
         }
     }
 }

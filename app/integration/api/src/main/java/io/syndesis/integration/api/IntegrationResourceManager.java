@@ -28,8 +28,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import io.syndesis.common.model.Dependency;
-import io.syndesis.common.model.WithDependencies;
 import io.syndesis.common.model.Dependency.Type;
+import io.syndesis.common.model.WithDependencies;
 import io.syndesis.common.model.connection.Connection;
 import io.syndesis.common.model.connection.ConnectionBase;
 import io.syndesis.common.model.connection.Connector;
@@ -139,13 +139,17 @@ public interface IntegrationResourceManager {
                                 .build();
                     }
                     // Prune Connector, nix actions. The action in use is on the Step
-                    Connector prunedConnector = new Connector.Builder().createFrom(
-                            replacement.getConnection().get().getConnector().get())
-                       .actions(new ArrayList<>()).build();
+                    Connector prunedConnector = new Connector.Builder()
+                        .createFrom(replacement.getConnection().get().getConnector().get())
+                        .actions(new ArrayList<>())
+                        .icon(null)
+                        .build();
+
                     // Replace with the new 'pruned' connector
                     Connection prunedConnection = new Connection.Builder()
                         .createFrom(connection)
                         .connector(prunedConnector)
+                        .icon(null)
                         .build();
                     // Replace with the new 'pruned' step
                     replacement =

@@ -76,7 +76,7 @@
 
     <!-- Global camel version used everywhere -->
     <camel.version>2.21.0.fuse-730049</camel.version>
-    <camel-k.version>0.3.0-SNAPSHOT</camel-k.version>
+    <camel-k.version>0.2.1</camel-k.version>
 
     <dep.plugin.dependency.version>3.0.2</dep.plugin.dependency.version>
     <dep.plugin.pmd.version>3.10.0</dep.plugin.pmd.version>
@@ -2206,6 +2206,7 @@
       <id>mrrc-redhat</id>
       <url>https://maven.repository.redhat.com/ga</url>
     </repository>
+    <!-- temporary for camel-k staging repo -->
     <repository>
       <id>apache.staging</id>
       <url>https://repository.apache.org/content/repositories/orgapachecamel-1120/</url>
@@ -2241,6 +2242,7 @@
       <name>Red Hat General Availability Repository</name>
       <url>https://maven.repository.redhat.com/ga</url>
     </pluginRepository>
+    <!-- temporary for camel-k staging repo -->
     <pluginRepository>
       <id>apache.staging</id>
       <url>https://repository.apache.org/content/repositories/orgapachecamel-1120/</url>

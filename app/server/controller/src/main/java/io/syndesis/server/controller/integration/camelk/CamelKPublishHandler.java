@@ -214,6 +214,13 @@ public class CamelKPublishHandler extends BaseCamelKHandler implements StateChan
                 .putConfiguration("version", "2.21.0.fuse-730049")
                 .build()
         );
+        integrationSpecBuilder.putTraits(
+            "camel",
+            new IntegrationTraitSpec.Builder()
+                //TODO: this should be provided by the VersionService
+                .putConfiguration("runtime-version", "0.2.1")
+                .build()
+        );
 
         //add dependencies
         getDependencies(integration).forEach( gav -> integrationSpecBuilder.addDependencies("mvn:"+gav.getId()));

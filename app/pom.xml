@@ -2206,17 +2206,6 @@
       <id>mrrc-redhat</id>
       <url>https://maven.repository.redhat.com/ga</url>
     </repository>
-    <!-- temporary for camel-k staging repo -->
-    <repository>
-      <id>apache.staging</id>
-      <url>https://repository.apache.org/content/repositories/orgapachecamel-1120/</url>
-      <releases>
-        <enabled>true</enabled>
-      </releases>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-    </repository>
     <repository>
       <id>apache.snapshots</id>
       <url>https://repository.apache.org/content/repositories/snapshots/</url>
@@ -2241,17 +2230,6 @@
       <id>redhat.ga</id>
       <name>Red Hat General Availability Repository</name>
       <url>https://maven.repository.redhat.com/ga</url>
-    </pluginRepository>
-    <!-- temporary for camel-k staging repo -->
-    <pluginRepository>
-      <id>apache.staging</id>
-      <url>https://repository.apache.org/content/repositories/orgapachecamel-1120/</url>
-      <releases>
-        <enabled>true</enabled>
-      </releases>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
     </pluginRepository>
     <pluginRepository>
       <id>apache.snapshots</id>

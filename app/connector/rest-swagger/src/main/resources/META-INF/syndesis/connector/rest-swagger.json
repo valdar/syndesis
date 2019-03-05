@@ -1,5 +1,4 @@
 {
-  "actions": [],
   "componentScheme": "rest-swagger",
   "configuredProperties": {
     "componentName": "connector-rest-swagger-http4"
@@ -24,8 +23,6 @@
       "type": "MAVEN"
     }
   ],
-  "description": "rest-swagger TODO:change this",
-  "icon": "",
   "id": "rest-swagger",
   "metadata": {
     "hide-from-connection-pages": "true"

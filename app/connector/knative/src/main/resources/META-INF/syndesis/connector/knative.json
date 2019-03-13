@@ -41,6 +41,45 @@
     },
     {
       "actionType": "connector",
+      "description": "Call Knative function",
+      "descriptor": {
+        "connectorFactory": "io.syndesis.connector.knative.KnativeComponentProxyFactory",
+        "configuredProperties": {
+          "type": "endpoint"
+        },
+        "inputDataShape": {
+          "kind": "any"
+        },
+        "outputDataShape": {
+          "kind": "none"
+        },
+        "propertyDefinitionSteps": [
+          {
+            "description": "Call a Knative function",
+            "name": "Call Knative function",
+            "properties": {
+              "name": {
+                "deprecated": false,
+                "displayName": "Function name",
+                "javaType": "java.lang.String",
+                "labelHint": "Name of the Knative function that will be called",
+                "required": true,
+                "secret": false,
+                "type": "string",
+                "tags": [
+                  "knative-endpoint"
+                ]
+              }
+            }
+          }
+        ]
+      },
+      "id": "io.syndesis:knative-endpoint-call-connector",
+      "name": "Call Function",
+      "pattern": "To"
+    },
+    {
+      "actionType": "connector",
       "description": "Receive events from Knative channel",
       "descriptor": {
         "connectorFactory": "io.syndesis.connector.knative.KnativeComponentProxyFactory",
@@ -76,6 +115,30 @@
       },
       "id": "io.syndesis:knative-channel-receive-connector",
       "name": "Subscribe to Channel",
+      "tags": [
+        "http-passive"
+      ],
+      "pattern": "From"
+    },
+    {
+      "actionType": "connector",
+      "description": "Expose integration as Knative function",
+      "descriptor": {
+        "connectorFactory": "io.syndesis.connector.knative.KnativeComponentProxyFactory",
+        "configuredProperties": {
+          "type": "endpoint",
+          "name": "default"
+        },
+        "inputDataShape": {
+          "kind": "none"
+        },
+        "outputDataShape": {
+          "kind": "any"
+        },
+        "propertyDefinitionSteps": []
+      },
+      "id": "io.syndesis:knative-endpoint-expose-connector",
+      "name": "Expose as Function",
       "tags": [
         "http-passive"
       ],

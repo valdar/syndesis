@@ -28,6 +28,7 @@ import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.k.RoutesLoader;
 import org.apache.camel.k.Runtime;
 import org.apache.camel.k.Source;
+import org.apache.camel.k.support.URIResolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -68,6 +69,6 @@ public class IntegrationRouteLoader implements RoutesLoader {
             LOGGER.info("{} IntegrationStepHandlers loaded.", integrationStepHandlers.size());
         }
 
-        return new IntegrationRouteBuilder(source.getLocation(), integrationStepHandlers, activityTracker);
+        return new IntegrationRouteBuilder(ctx -> URIResolver.resolve(ctx, source), integrationStepHandlers, activityTracker);
     }
 }

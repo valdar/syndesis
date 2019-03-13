@@ -69,7 +69,7 @@ public class ComponentProxyComponent extends DefaultComponent {
         this.componentSchemeAlias = Optional.empty();
         this.configuredOptions = new HashMap<>();
         this.remainingOptions = new HashMap<>();
-        this.catalog = new DefaultCamelCatalog(false);
+        this.catalog = createCatalog();
 
         try {
             this.definition = ComponentDefinition.forScheme(catalog, componentScheme);
@@ -78,6 +78,10 @@ public class ComponentProxyComponent extends DefaultComponent {
         }
 
         registerExtension(this::getComponentVerifierExtension);
+    }
+
+    protected CamelCatalog createCatalog() {
+        return new DefaultCamelCatalog(false);
     }
 
     public void setOptions(Map<String, Object> options) {

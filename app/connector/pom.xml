@@ -71,6 +71,7 @@
     <module>concur</module>
     <module>kudu</module>
     <module>odata</module>
+    <module>knative</module>
   </modules>
 
   <dependencyManagement>

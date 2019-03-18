@@ -64,12 +64,16 @@ public class ComponentProxyComponent extends DefaultComponent {
     private Processor afterConsumer;
 
     public ComponentProxyComponent(String componentId, String componentScheme) {
+        this(componentId, componentScheme, new DefaultCamelCatalog(false));
+    }
+
+    public ComponentProxyComponent(String componentId, String componentScheme, CamelCatalog catalog) {
         this.componentId = componentId;
         this.componentScheme = componentScheme;
         this.componentSchemeAlias = Optional.empty();
         this.configuredOptions = new HashMap<>();
         this.remainingOptions = new HashMap<>();
-        this.catalog = createCatalog();
+        this.catalog = catalog;
 
         try {
             this.definition = ComponentDefinition.forScheme(catalog, componentScheme);
@@ -78,10 +82,6 @@ public class ComponentProxyComponent extends DefaultComponent {
         }
 
         registerExtension(this::getComponentVerifierExtension);
-    }
-
-    protected CamelCatalog createCatalog() {
-        return new DefaultCamelCatalog(false);
     }
 
     public void setOptions(Map<String, Object> options) {

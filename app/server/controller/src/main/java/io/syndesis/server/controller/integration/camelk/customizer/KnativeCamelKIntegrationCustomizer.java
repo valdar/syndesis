@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -41,6 +42,7 @@ public class KnativeCamelKIntegrationCustomizer implements CamelKIntegrationCust
         integration = customizeChannels(deployment, integration);
         integration = customizeService(deployment, integration);
         integration = customizeProperties(deployment, integration, secret);
+        integration = customizePaths(deployment, integration, secret);
         return integration;
     }
 
@@ -126,6 +128,40 @@ public class KnativeCamelKIntegrationCustomizer implements CamelKIntegrationCust
                 }
 
                 integration.setSpec(spec.build());
+            }
+
+        }
+        return integration;
+    }
+
+    protected Integration customizePaths(IntegrationDeployment deployment, Integration integration, Secret secret) {
+        if (KNATIVE_SERVING_03_COMPAT && isKnativeServiceNeeded(deployment)) {
+            // Only do this if using Knative serving 0.3
+            // Replace absolute path with relative to /deployments
+
+            if (integration.getSpec() != null && integration.getSpec().getConfiguration() != null) {
+
+                boolean edited = false;
+                String lookupKey = "AB_JMX_EXPORTER_CONFIG=";
+                List<ConfigurationSpec> newConf = new ArrayList<>();
+                for (ConfigurationSpec conf : integration.getSpec().getConfiguration()) {
+                    if ("env".equals(conf.getType()) && conf.getValue() != null && conf.getValue().startsWith(lookupKey)) {
+                        newConf.add(new ConfigurationSpec.Builder()
+                            .type("env")
+                            .value(conf.getValue().replace(lookupKey, lookupKey + "/deployments"))
+                            .build());
+                        edited = true;
+                    } else {
+                        newConf.add(conf);
+                    }
+                }
+
+                if (edited) {
+                    IntegrationSpec.Builder spec = new IntegrationSpec.Builder()
+                        .from(integration.getSpec())
+                        .configuration(newConf);
+                    integration.setSpec(spec.build());
+                }
             }
 
         }

@@ -41,7 +41,7 @@
     },
     {
       "actionType": "connector",
-      "description": "Call Knative function",
+      "description": "Call Knative service",
       "descriptor": {
         "connectorFactory": "io.syndesis.connector.knative.KnativeComponentProxyFactory",
         "configuredProperties": {
@@ -55,14 +55,14 @@
         },
         "propertyDefinitionSteps": [
           {
-            "description": "Call a Knative function",
-            "name": "Call Knative function",
+            "description": "Call a Knative service",
+            "name": "Call Knative service",
             "properties": {
               "name": {
                 "deprecated": false,
-                "displayName": "Function name",
+                "displayName": "Service name",
                 "javaType": "java.lang.String",
-                "labelHint": "Name of the Knative function that will be called",
+                "labelHint": "Name of the Knative service that will be called",
                 "required": true,
                 "secret": false,
                 "type": "string",
@@ -75,7 +75,7 @@
         ]
       },
       "id": "io.syndesis:knative-endpoint-call-connector",
-      "name": "Call Function",
+      "name": "Call Service",
       "pattern": "To"
     },
     {
@@ -122,7 +122,7 @@
     },
     {
       "actionType": "connector",
-      "description": "Expose integration as Knative function",
+      "description": "Expose integration as Knative service",
       "descriptor": {
         "connectorFactory": "io.syndesis.connector.knative.KnativeComponentProxyFactory",
         "configuredProperties": {
@@ -138,7 +138,7 @@
         "propertyDefinitionSteps": []
       },
       "id": "io.syndesis:knative-endpoint-expose-connector",
-      "name": "Expose as Function",
+      "name": "Expose as Service",
       "tags": [
         "http-passive"
       ],

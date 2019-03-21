@@ -665,6 +665,9 @@
       "type": "string"
     }
   },
+  "configuredProperties": {
+    "lazyLogin" : "true"
+  },
   "tags": [
     "verifier"
   ]

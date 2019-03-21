@@ -227,6 +227,7 @@
           "operationName": "getSObjectWithId",
           "rawPayload": "true"
         },
+        "connectorFactory": "io.syndesis.connector.salesforce.SalesforceCachingComponentProxyFactory",
         "connectorCustomizers": [
           "io.syndesis.connector.salesforce.customizer.ExpectingIdCustomizer",
           "io.syndesis.connector.salesforce.customizer.DataShapeCustomizer"

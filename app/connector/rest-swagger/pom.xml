@@ -31,7 +31,6 @@
   <packaging>jar</packaging>
 
   <dependencies>
-
     <dependency>
       <groupId>org.apache.camel</groupId>
       <artifactId>camel-core</artifactId>
@@ -45,8 +44,18 @@
 
     <!-- base component to use for this connector -->
     <dependency>
+      <groupId>io.syndesis.common</groupId>
+      <artifactId>common-util</artifactId>
+    </dependency>
+
+    <dependency>
       <groupId>org.apache.camel</groupId>
-      <artifactId>camel-rest-swagger</artifactId>
+      <artifactId>camel-core</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>io.syndesis.common</groupId>
+      <artifactId>common-model</artifactId>
     </dependency>
 
     <!-- camel-connector -->
@@ -64,29 +73,8 @@
 
     <dependency>
       <groupId>org.apache.camel</groupId>
-      <artifactId>camel-http-common</artifactId>
-    </dependency>
-
-    <!-- support for Spring Boot auto configuration generation -->
-    <dependency>
-      <groupId>org.apache.camel</groupId>
-      <artifactId>camel-spring-boot</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>io.syndesis.common</groupId>
-      <artifactId>common-model</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>io.syndesis.integration</groupId>
-      <artifactId>integration-component-proxy</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>io.syndesis.connector</groupId>
-      <artifactId>connector-support-processor</artifactId>
-      <scope>runtime</scope>
+      <artifactId>camel-rest-swagger</artifactId>
+      <scope>provided</scope>
     </dependency>
 
     <dependency>
@@ -150,6 +138,27 @@
       <artifactId>jcl-over-slf4j</artifactId>
       <scope>runtime</scope>
     </dependency>
+
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-databind</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-databind</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-core</artifactId>
+    </dependency>
+
 
     <!-- testing -->
     <dependency>

@@ -70,6 +70,15 @@ class OAuthRefreshTokenProcessor implements Processor {
             tryToRefreshAccessToken();
         }
 
+        final Message in = exchange.getIn();
+        in.setHeader("Authorization", "Bearer " + accessToken);
+
+        SyndesisHeaderStrategy.whitelist(exchange, "Authorization");
+    }
+
+    boolean canProcessRefresh() {
+        return refreshToken != null && authorizationEndpoint != null
+            && (!authorizeUsingParameters || (authorizeUsingParameters && clientId != null && clientSecret != null));
     }
 
     CloseableHttpClient createHttpClient() {

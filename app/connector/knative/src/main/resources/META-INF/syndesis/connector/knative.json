@@ -67,7 +67,7 @@
                 "secret": false,
                 "type": "string",
                 "tags": [
-                  "knative-endpoint"
+                  "knative-sink-endpoint"
                 ]
               }
             }

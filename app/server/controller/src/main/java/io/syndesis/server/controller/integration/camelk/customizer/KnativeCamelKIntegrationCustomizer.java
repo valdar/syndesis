@@ -31,6 +31,7 @@ public class KnativeCamelKIntegrationCustomizer implements CamelKIntegrationCust
 
     private static final String KNATIVE_SOURCE_CHANNEL_TAG = "knative-source-channel";
     private static final String KNATIVE_SINK_CHANNEL_TAG = "knative-sink-channel";
+    private static final String KNATIVE_SINK_ENDPOINT_TAG = "knative-sink-endpoint";
 
     private static final String HTTP_PASSIVE_TAG = "http-passive";
 
@@ -39,14 +40,14 @@ public class KnativeCamelKIntegrationCustomizer implements CamelKIntegrationCust
 
     @Override
     public Integration customize(IntegrationDeployment deployment, Integration integration, Secret secret) {
-        integration = customizeChannels(deployment, integration);
+        integration = customizeSourceSink(deployment, integration);
         integration = customizeService(deployment, integration);
         integration = customizeProperties(deployment, integration, secret);
         integration = customizePaths(deployment, integration, secret);
         return integration;
     }
 
-    protected Integration customizeChannels(IntegrationDeployment deployment, Integration integration) {
+    protected Integration customizeSourceSink(IntegrationDeployment deployment, Integration integration) {
         List<String> sourceChannels = deployment.getSpec().getFlows().stream()
             .flatMap(f -> f.getSteps().stream())
             .flatMap(s -> asStream(s.getAction().flatMap(a -> a.propertyTaggedWith(s.getConfiguredProperties(), KNATIVE_SOURCE_CHANNEL_TAG))))
@@ -57,24 +58,29 @@ public class KnativeCamelKIntegrationCustomizer implements CamelKIntegrationCust
             .flatMap(s -> asStream(s.getAction().flatMap(a -> a.propertyTaggedWith(s.getConfiguredProperties(), KNATIVE_SINK_CHANNEL_TAG))))
             .collect(Collectors.toList());
 
+        List<String> sinkEndpoints = deployment.getSpec().getFlows().stream()
+            .flatMap(f -> f.getSteps().stream())
+            .flatMap(s -> asStream(s.getAction().flatMap(a -> a.propertyTaggedWith(s.getConfiguredProperties(), KNATIVE_SINK_ENDPOINT_TAG))))
+            .collect(Collectors.toList());
 
-        if (!sourceChannels.isEmpty() || !sinkChannels.isEmpty()) {
-            String sources = sourceChannels.stream().collect(Collectors.joining(","));
-            String sinks = sinkChannels.stream().collect(Collectors.joining(","));
+        String channelSources = sourceChannels.stream().collect(Collectors.joining(","));
+        String channelSinks = sinkChannels.stream().collect(Collectors.joining(","));
+        String endpointSinks = sinkEndpoints.stream().collect(Collectors.joining(","));
 
-            IntegrationSpec.Builder spec = new IntegrationSpec.Builder();
-            if (integration.getSpec() != null) {
-                spec = spec.from(integration.getSpec());
-            }
-            integration.setSpec(
-                spec.putTraits(KNATIVE_TRAIT, new IntegrationTraitSpec.Builder()
-                    .putConfiguration("enabled", "true")
-                    .putConfiguration("sources", sources)
-                    .putConfiguration("sinks", sinks)
-                    .build()
-                ).build()
-            );
+        IntegrationSpec.Builder spec = new IntegrationSpec.Builder();
+        if (integration.getSpec() != null) {
+            spec = spec.from(integration.getSpec());
         }
+        integration.setSpec(
+            spec.putTraits(KNATIVE_TRAIT, new IntegrationTraitSpec.Builder()
+                .putConfiguration("enabled", "true")
+                .putConfiguration("channel-sources", channelSources)
+                .putConfiguration("channel-sinks", channelSinks)
+                .putConfiguration("endpoint-sources", "default")
+                .putConfiguration("endpoint-sinks", endpointSinks)
+                .build()
+            ).build()
+        );
 
         return integration;
     }

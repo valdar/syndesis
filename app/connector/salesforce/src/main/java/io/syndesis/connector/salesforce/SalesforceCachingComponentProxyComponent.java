@@ -138,7 +138,7 @@ public class SalesforceCachingComponentProxyComponent extends ComponentProxyComp
 
                         if (val != null) {
                             //
-                            // Set the body with the cached value
+                            // Set the body with the cached or retrieved value
                             //
                             exchange.getOut().setBody(new ByteArrayInputStream(val.payload));
                         }

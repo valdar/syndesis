@@ -153,7 +153,7 @@
       "type": "MAVEN"
     },
     {
-      "id": "org.apache.camel.k:camel-knative:@camel-k.version@",
+      "id": "org.apache.camel.k:camel-knative:@camel-k-runtime.version@",
       "type": "MAVEN"
     }
   ],

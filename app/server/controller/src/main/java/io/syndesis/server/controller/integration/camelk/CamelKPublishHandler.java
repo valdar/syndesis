@@ -49,6 +49,7 @@ import io.syndesis.common.util.Names;
 import io.syndesis.integration.api.IntegrationProjectGenerator;
 import io.syndesis.integration.api.IntegrationResourceManager;
 import io.syndesis.integration.project.generator.mvn.MavenGav;
+import io.syndesis.server.controller.ControllersConfigurationProperties;
 import io.syndesis.server.controller.StateChangeHandler;
 import io.syndesis.server.controller.StateUpdate;
 import io.syndesis.server.controller.integration.IntegrationPublishValidator;
@@ -79,8 +80,7 @@ public class CamelKPublishHandler extends BaseCamelKHandler implements StateChan
     private final IntegrationProjectGenerator projectGenerator;
     private final VersionService versionService;
     private final List<CamelKIntegrationCustomizer> customizers;
-
-    private boolean compress;
+    private final ControllersConfigurationProperties configuration;
 
     public CamelKPublishHandler(
         OpenShiftService openShiftService,
@@ -90,15 +90,14 @@ public class CamelKPublishHandler extends BaseCamelKHandler implements StateChan
         IntegrationPublishValidator validator,
         IntegrationResourceManager resourceManager,
         VersionService versionService,
-        List<CamelKIntegrationCustomizer> customizers) {
+        List<CamelKIntegrationCustomizer> customizers,
+        ControllersConfigurationProperties configuration) {
         super(openShiftService, iDao, idDao, validator);
         this.projectGenerator = projectGenerator;
         this.resourceManager = resourceManager;
         this.versionService = versionService;
         this.customizers = customizers;
-
-        // this should be taken from a configuration
-        this.compress = false;
+        this.configuration = configuration;
     }
 
     @Override
@@ -300,6 +299,11 @@ public class CamelKPublishHandler extends BaseCamelKHandler implements StateChan
                                                     +"prometheus.io/scrape")
                 .build());
 
+        
+        this.configuration.getCamelk().getEnvironment().forEach((k, v) -> {
+            integrationSpecBuilder.addConfiguration(new ConfigurationSpec.Builder().type("env").value(k + "=" + v).build());
+        });
+
         //add dependencies
         integrationSpecBuilder.addDependencies("bom:io.syndesis.integration/integration-bom-camel-k/pom/"+versionService.getVersion());
         integrationSpecBuilder.addDependencies("mvn:io.syndesis.integration/integration-runtime-camelk");
@@ -350,14 +354,14 @@ public class CamelKPublishHandler extends BaseCamelKHandler implements StateChan
 
     private void addIntegrationSource(Integration integration, ImmutableIntegrationSpec.Builder builder) throws IOException {
         final String json = extractIntegrationJson(integration);
-        final String content = compress ? CamelKSupport.compress(json) : json;
+        final String content = configuration.getCamelk().isCompression() ? CamelKSupport.compress(json) : json;
         final String name = integration.getId().get();
 
         logInfo(integration,"integration.json: {}", content);
 
         builder.addSources(new SourceSpec.Builder()
             .dataSpec(new DataSpec.Builder()
-                .compression(compress)
+                .compression(configuration.getCamelk().isCompression())
                 .content(content)
                 .name(Names.sanitize(name))
             .build())
@@ -378,13 +382,13 @@ public class CamelKPublishHandler extends BaseCamelKHandler implements StateChan
                     final Map<String, String> properties = step.getConfiguredProperties();
                     final String name = "mapping-flow-" + f + "-step-"  + s + ".json";
                     final String mapping = properties.get("atlasmapping");
-                    final String content = compress ? CamelKSupport.compress(mapping) : mapping;
+                    final String content = configuration.getCamelk().isCompression() ? CamelKSupport.compress(mapping) : mapping;
 
                     if (content != null) {
                         builder.addResources(
                             new ResourceSpec.Builder()
                                 .dataSpec(new DataSpec.Builder()
-                                    .compression(compress)
+                                    .compression(configuration.getCamelk().isCompression())
                                     .name(name)
                                     .content(content)
                                 .build())
@@ -417,13 +421,13 @@ public class CamelKPublishHandler extends BaseCamelKHandler implements StateChan
         }
 
         final byte[] openApiBytes = res.get().getDocument();
-        final String content = compress ? CamelKSupport.compress(openApiBytes) : new String(openApiBytes, UTF_8);
+        final String content = configuration.getCamelk().isCompression() ? CamelKSupport.compress(openApiBytes) : new String(openApiBytes, UTF_8);
         final String name = openApiResource.name().orElse(maybeOpenApiResourceId.get());
 
         builder.addResources(
             new ResourceSpec.Builder()
                 .dataSpec(new DataSpec.Builder()
-                    .compression(compress)
+                    .compression(configuration.getCamelk().isCompression())
                     .name(Names.sanitize(name))
                     .content(content)
                 .build())

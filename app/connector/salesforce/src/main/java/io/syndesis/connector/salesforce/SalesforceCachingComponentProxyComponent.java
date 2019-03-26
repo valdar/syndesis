@@ -36,6 +36,7 @@ import org.apache.camel.util.ServiceHelper;
 import org.infinispan.client.hotrod.RemoteCacheManager;
 import org.infinispan.client.hotrod.configuration.Configuration;
 import org.infinispan.client.hotrod.configuration.ConfigurationBuilder;
+import org.infinispan.client.hotrod.configuration.NearCacheMode;
 import org.infinispan.client.hotrod.configuration.SaslQop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -89,11 +90,13 @@ public class SalesforceCachingComponentProxyComponent extends ComponentProxyComp
                         super.stop();
                         ServiceHelper.stopService(producer.get());
                     }
+
                     @Override
                     public void suspend() throws Exception {
                         super.suspend();
                         ServiceHelper.suspendService(producer.get());
                     }
+                    
                     @Override
                     public void resume() throws Exception {
                         super.resume();
@@ -166,10 +169,12 @@ public class SalesforceCachingComponentProxyComponent extends ComponentProxyComp
         // "datagrid-service.datagrid-demo.svc.cluster.local"
         // 11222
         String host = System.getenv().get("DATAGRID_SERVICE_HOST");
-        String port = System.getenv().getOrDefault("DATAGRID_SERVICE_PORT", "11222");
-
         if (host != null) {
+            String port = System.getenv().getOrDefault("DATAGRID_SERVICE_PORT", "11222");
+            String name = System.getenv().getOrDefault("DATAGRID_CACHE_NAME", "camel-salesforce");
+
             Configuration config = new ConfigurationBuilder()
+                .nearCache().mode(NearCacheMode.INVALIDATED)
                 .addServer()
                 .host(host)
                 .port(Integer.parseInt(port))
@@ -184,7 +189,7 @@ public class SalesforceCachingComponentProxyComponent extends ComponentProxyComp
                 .saslQop(SaslQop.AUTH)
                 .build();
 
-            return new RemoteCacheManager(config).getCache("camel-salesforce");
+            return new RemoteCacheManager(config).getCache(name);
         } else {
             return new ConcurrentHashMap<>();
         }

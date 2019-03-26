@@ -154,7 +154,8 @@ public class KnativeCamelKIntegrationCustomizer implements CamelKIntegrationCust
                     if ("env".equals(conf.getType()) && conf.getValue() != null && conf.getValue().startsWith(lookupKey)) {
                         newConf.add(new ConfigurationSpec.Builder()
                             .type("env")
-                            .value(conf.getValue().replace(lookupKey, lookupKey + "/deployments"))
+                            // let's use the default prometheus config (needs to be injected from elsewhere)
+                            .value("/opt/prometheus/prometheus-config.yml")
                             .build());
                         edited = true;
                     } else {

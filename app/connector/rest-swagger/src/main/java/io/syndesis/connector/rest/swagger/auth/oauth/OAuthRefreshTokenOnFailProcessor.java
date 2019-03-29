@@ -27,13 +27,13 @@ import org.apache.camel.http.common.HttpOperationFailedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-class OAuthRefreshTokenOnFailProcessor extends OAuthRefreshTokenProcessor {
+public class OAuthRefreshTokenOnFailProcessor extends OAuthRefreshTokenProcessor {
 
     private static final Logger LOG = LoggerFactory.getLogger(OAuthRefreshTokenOnFailProcessor.class);
 
     private Set<Integer> statusesToRefreshFor = new HashSet<>();
 
-    OAuthRefreshTokenOnFailProcessor(final Configuration configuration) {
+    public OAuthRefreshTokenOnFailProcessor(final Configuration configuration) {
         super(configuration);
 
         final String statuses = configuration.stringOption("refreshTokenRetryStatuses");

@@ -15,27 +15,31 @@
  */
 package io.syndesis.connector.rest.swagger;
 
-import java.util.List;
-
+import io.syndesis.connector.rest.swagger.auth.oauth.OAuthRefreshTokenOnFailProcessor;
+import io.syndesis.integration.component.proxy.ComponentProxyProducer;
 import org.apache.camel.Consumer;
+import org.apache.camel.Endpoint;
 import org.apache.camel.Processor;
 import org.apache.camel.Producer;
-import org.apache.camel.component.connector.ConnectorProducer;
-import org.apache.camel.component.connector.DefaultConnectorEndpoint;
 import org.apache.camel.http.common.HttpOperationFailedException;
 import org.apache.camel.impl.DefaultEndpoint;
+import org.apache.camel.processor.CatchProcessor;
 import org.apache.camel.processor.Pipeline;
+import org.apache.camel.processor.TryProcessor;
+
+import java.util.Arrays;
+import java.util.List;
 
 import static java.util.Collections.singletonList;
 
 class OAuthRefreshingEndpoint extends DefaultEndpoint {
     private static final List<Class<? extends Throwable>> EXCEPTIONS_HANDLED = singletonList(HttpOperationFailedException.class);
 
-    private final DefaultConnectorEndpoint endpoint;
+    private final Endpoint endpoint;
 
     private final Pipeline pipeline;
 
-    OAuthRefreshingEndpoint(final DefaultConnectorEndpoint endpoint, final SwaggerConnectorComponent component) {
+    OAuthRefreshingEndpoint(final Endpoint endpoint, final SwaggerConnectorComponent component, final Configuration configuration) {
         super(endpoint.getEndpointUri(), component);
         this.endpoint = endpoint;
 
@@ -46,23 +50,13 @@ class OAuthRefreshingEndpoint extends DefaultEndpoint {
             throw new ExceptionInInitializerError(e);
         }
 
-        pipeline = null;
-        // final OAuthRefreshTokenProcessor refreshProcessor = new
-        // OAuthRefreshTokenProcessor((SwaggerConnectorComponent)
-        // getComponent());
-        //
-        // final Processor catchBody = new
-        // OAuthRefreshTokenOnFailProcessor((SwaggerConnectorComponent)
-        // getComponent());
-        //
-        // final Processor catchProcessor = new
-        // CatchProcessor(EXCEPTIONS_HANDLED, catchBody, null, null);
-        //
-        // final Processor tryProcessor = new TryProcessor(producer,
-        // singletonList(catchProcessor), null);
-        //
-        // pipeline = new Pipeline(endpoint.getCamelContext(),
-        // Arrays.asList(refreshProcessor, tryProcessor));
+        final Processor catchBody = new OAuthRefreshTokenOnFailProcessor(configuration);
+
+        final Processor catchProcessor = new CatchProcessor(EXCEPTIONS_HANDLED, catchBody, null, null);
+
+        final Processor tryProcessor = new TryProcessor(producer, singletonList(catchProcessor), null);
+
+        pipeline = new Pipeline(endpoint.getCamelContext(), Arrays.asList(tryProcessor));
     }
 
     @Override
@@ -72,7 +66,7 @@ class OAuthRefreshingEndpoint extends DefaultEndpoint {
 
     @Override
     public Producer createProducer() throws Exception {
-        return new ConnectorProducer(endpoint, pipeline);
+        return new ComponentProxyProducer(endpoint, pipeline);
     }
 
     @Override

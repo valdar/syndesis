@@ -15,8 +15,6 @@
  */
 package io.syndesis.connector.rest.swagger;
 
-import java.util.Map;
-
 import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
 import org.apache.camel.Producer;
@@ -26,6 +24,8 @@ import org.apache.camel.component.http4.HttpProducer;
 import org.apache.camel.impl.DefaultHeaderFilterStrategy;
 import org.apache.camel.spi.HeaderFilterStrategy;
 import org.apache.camel.spi.RestConfiguration;
+
+import java.util.Map;
 
 public final class WithSyndesisHeaderFilterStrategy extends HttpComponent {
 
@@ -44,28 +44,28 @@ public final class WithSyndesisHeaderFilterStrategy extends HttpComponent {
 
         @Override
         public boolean applyFilterToCamelHeaders(final String headerName, final Object headerValue, final Exchange exchange) {
-            final boolean globalWouldFilter = globalFilter.applyFilterToCamelHeaders(headerName, headerValue, exchange);
-            final boolean restWouldFilter = restFilter.applyFilterToCamelHeaders(headerName, headerValue, exchange);
+//            final boolean globalWouldFilter = globalFilter.applyFilterToCamelHeaders(headerName, headerValue, exchange);
+//            final boolean restWouldFilter = restFilter.applyFilterToCamelHeaders(headerName, headerValue, exchange);
 
             // global | rest | outcome
             // false | false | false => both agree header should not be filtered
             // false | true | false => global has precedence over rest
             // true | false | true => global has precedence over rest
             // true | true | true => both agree header should be filtered out
-            return globalWouldFilter || (globalWouldFilter && !restWouldFilter);
+            return globalFilter.applyFilterToCamelHeaders(headerName, headerValue, exchange);
         }
 
         @Override
         public boolean applyFilterToExternalHeaders(final String headerName, final Object headerValue, final Exchange exchange) {
-            final boolean globalWouldFilter = globalFilter.applyFilterToExternalHeaders(headerName, headerValue, exchange);
-            final boolean restWouldFilter = restFilter.applyFilterToExternalHeaders(headerName, headerValue, exchange);
+//            final boolean globalWouldFilter = globalFilter.applyFilterToExternalHeaders(headerName, headerValue, exchange);
+//            final boolean restWouldFilter = restFilter.applyFilterToExternalHeaders(headerName, headerValue, exchange);
 
             // global | rest | outcome
             // false | false | false => both agree header should not be filtered
             // false | true | false => global has precedence over rest
             // true | false | true => global has precedence over rest
             // true | true | true => both agree header should be filtered out
-            return globalWouldFilter || (globalWouldFilter && !restWouldFilter);
+            return globalFilter.applyFilterToExternalHeaders(headerName, headerValue, exchange);
         }
 
     }

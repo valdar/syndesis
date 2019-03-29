@@ -41,9 +41,7 @@ public interface ConnectorTemplate extends WithId<ConnectorTemplate>, WithName, 
         return new Builder().createFrom(this);
     }
 
-    String getCamelConnectorGAV();
-
-    String getCamelConnectorPrefix();
+    String getComponentSchema();
 
     Optional<ConnectorGroup> getConnectorGroup();
 

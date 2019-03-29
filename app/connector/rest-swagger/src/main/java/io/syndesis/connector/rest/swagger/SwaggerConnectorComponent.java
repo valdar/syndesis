@@ -15,17 +15,17 @@
  */
 package io.syndesis.connector.rest.swagger;
 
+import io.syndesis.integration.component.proxy.ComponentDefinition;
+import io.syndesis.integration.component.proxy.ComponentProxyComponent;
+import org.apache.camel.Endpoint;
+
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.apache.camel.Endpoint;
-import org.apache.camel.component.connector.DefaultConnectorComponent;
-import org.apache.camel.component.connector.DefaultConnectorEndpoint;
-
-public final class SwaggerConnectorComponent extends DefaultConnectorComponent {
+public final class SwaggerConnectorComponent extends ComponentProxyComponent {
 
     private String accessToken;
 
@@ -56,7 +56,7 @@ public final class SwaggerConnectorComponent extends DefaultConnectorComponent {
     }
 
     public SwaggerConnectorComponent(final String componentSchema) {
-        super("swagger-connector", componentSchema, SwaggerConnectorComponent.class);
+        super("swagger-connector", componentSchema);
     }
 
     public String getAccessToken() {
@@ -168,11 +168,14 @@ public final class SwaggerConnectorComponent extends DefaultConnectorComponent {
     }
 
     @Override
-    protected Endpoint createEndpoint(final String uri, final String remaining, final Map<String, Object> parameters) throws Exception {
-        final DefaultConnectorEndpoint endpoint = null;
+    protected Endpoint createDelegateEndpoint(ComponentDefinition definition, String scheme, Map<String, String> options) throws Exception {
+        final Endpoint endpoint = super.createDelegateEndpoint(definition, scheme, options);
+
+
 
         if (authenticationType == AuthenticationType.oauth2 && refreshToken != null && !refreshTokenRetryStatuses.isEmpty()) {
-            return new OAuthRefreshingEndpoint(endpoint, this);
+            Configuration configuration = (Configuration)getOption("xxx");
+            return new OAuthRefreshingEndpoint(endpoint, this, configuration);
         }
 
         return endpoint;

@@ -44,7 +44,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 /**
  * Refreshes the OAuth token based on the expiry time of the token.
  */
-class OAuthRefreshTokenProcessor implements Processor {
+public class OAuthRefreshTokenProcessor implements Processor {
 
     /**
      * The number of milliseconds we try to refresh the access token before it

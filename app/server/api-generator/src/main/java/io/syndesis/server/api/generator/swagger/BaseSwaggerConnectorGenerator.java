@@ -188,8 +188,7 @@ abstract class BaseSwaggerConnectorGenerator extends ConnectorGenerator {
         final Map<String, Path> paths = swagger.getPaths();
 
         final String connectorId = connector.getId().get();
-        final String connectorGav = connectorTemplate.getCamelConnectorGAV();
-        final String connectorScheme = connectorTemplate.getCamelConnectorPrefix();
+        final String connectorScheme = connectorTemplate.getComponentSchema();
 
         final List<ConnectorAction> actions = new ArrayList<>();
         final Map<String, Integer> operationIdCounts = new HashMap<>();
@@ -221,15 +220,14 @@ abstract class BaseSwaggerConnectorGenerator extends ConnectorGenerator {
                 }
 
                 final ConnectorDescriptor descriptor = createDescriptor(info.getResolvedJsonGraph(), swagger, operation)//
-                    .camelConnectorGAV(connectorGav)//
-                    .camelConnectorPrefix(connectorScheme)//
+                    .componentScheme(connectorScheme)//
                     .connectorId(connectorId)//
                     .build();
 
                 final OperationDescription description = SwaggerHelper.operationDescriptionOf(swagger, operation, (m, p) -> "Send " + m + " request to " + p);
 
                 final ConnectorAction action = new ConnectorAction.Builder()//
-                    .id(createActionId(connectorId, connectorGav, operation))//
+                    .id(createActionId(connectorId, operation))//
                     .name(description.name)//
                     .description(description.description)//
                     .pattern(Action.Pattern.To)//
@@ -299,8 +297,8 @@ abstract class BaseSwaggerConnectorGenerator extends ConnectorGenerator {
         }
     }
 
-    static String createActionId(final String connectorId, final String connectorGav, final Operation operation) {
-        return connectorGav + ":" + connectorId + ":" + operation.getOperationId();
+    static String createActionId(final String connectorId, final Operation operation) {
+        return connectorId + ":" + operation.getOperationId();
     }
 
     static List<PropertyValue> createEnums(final List<String> enums) {

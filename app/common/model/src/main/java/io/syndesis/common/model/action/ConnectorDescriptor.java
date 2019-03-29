@@ -48,7 +48,6 @@ public interface ConnectorDescriptor extends ActionDescriptor, WithConfiguredPro
                     .name(name)
                     .description(description)
             );
-
             return this;
         }
 
@@ -102,9 +101,9 @@ public interface ConnectorDescriptor extends ActionDescriptor, WithConfiguredPro
 
     String getConnectorId();
 
-    String getCamelConnectorGAV();
-
-    String getCamelConnectorPrefix();
+//    String getCamelConnectorGAV();
+//
+//    String getCamelConnectorPrefix();
 
     // This is set to optional for backward compatibility with camel style connectors
     Optional<String> getComponentScheme();

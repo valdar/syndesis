@@ -4,8 +4,7 @@
       "actionType": "connector",
       "description": "Send PUT request to /pet",
       "descriptor": {
-        "camelConnectorGAV": "io.syndesis.connector:connector-rest-swagger:@project.version@",
-        "camelConnectorPrefix": "swagger-operation",
+        "componentScheme": "rest-swagger",
         "configuredProperties": {
           "operationId": "updatePet"
         },
@@ -22,7 +21,7 @@
           "kind": "none"
         }
       },
-      "id": "io.syndesis.connector:connector-rest-swagger:@project.version@:_id_:updatePet",
+      "id": "_id_:updatePet",
       "name": "Update an existing pet",
       "pattern": "To",
       "tags": [
@@ -33,8 +32,7 @@
       "actionType": "connector",
       "description": "Send POST request to /pet",
       "descriptor": {
-        "camelConnectorGAV": "io.syndesis.connector:connector-rest-swagger:@project.version@",
-        "camelConnectorPrefix": "swagger-operation",
+        "componentSchema": "rest-swagger",
         "configuredProperties": {
           "operationId": "addPet"
         },
@@ -51,7 +49,7 @@
           "kind": "none"
         }
       },
-      "id": "io.syndesis.connector:connector-rest-swagger:@project.version@:_id_:addPet",
+      "id": "_id_:addPet",
       "name": "Add a new pet to the store",
       "pattern": "To",
       "tags": [
@@ -62,8 +60,7 @@
       "actionType": "connector",
       "description": "Multiple status values can be provided with comma separated strings",
       "descriptor": {
-        "camelConnectorGAV": "io.syndesis.connector:connector-rest-swagger:@project.version@",
-        "camelConnectorPrefix": "swagger-operation",
+        "componentSchema": "rest-swagger",
         "configuredProperties": {
           "operationId": "findPetsByStatus"
         },
@@ -86,7 +83,7 @@
           "specification": "{\"$schema\":\"http://json-schema.org/schema#\", \"$id\": \"io:syndesis:wrapped\",  \"$id\": \"io:syndesis:wrapped\", \"properties\":{\"body\":{\"items\":{\"properties\":{\"category\":{\"properties\":{\"id\":{\"type\":\"integer\"},\"name\":{\"type\":\"string\"}},\"type\":\"object\",\"xml\":{\"name\":\"Category\"}},\"id\":{\"type\":\"integer\"},\"name\":{\"example\":\"doggie\",\"type\":\"string\"},\"photoUrls\":{\"items\":{\"type\":\"string\"},\"type\":\"array\",\"xml\":{\"name\":\"photoUrl\",\"wrapped\":true}},\"status\":{\"description\":\"pet status in the store\",\"enum\":[\"available\",\"pending\",\"sold\"],\"type\":\"string\"},\"tags\":{\"items\":{\"properties\":{\"id\":{\"type\":\"integer\"},\"name\":{\"type\":\"string\"}},\"type\":\"object\",\"xml\":{\"name\":\"Tag\"}},\"type\":\"array\",\"xml\":{\"name\":\"tag\",\"wrapped\":true}}},\"required\":[\"name\",\"photoUrls\"],\"type\":\"object\",\"xml\":{\"name\":\"Pet\"}},\"type\":\"array\" }}, \"type\":\"object\" }"
         }
       },
-      "id": "io.syndesis.connector:connector-rest-swagger:@project.version@:_id_:findPetsByStatus",
+      "id": "_id_:findPetsByStatus",
       "name": "Finds Pets by status",
       "pattern": "To",
       "tags": [
@@ -97,8 +94,7 @@
       "actionType": "connector",
       "description": "Muliple tags can be provided with comma separated strings. Use tag1, tag2, tag3 for testing.",
       "descriptor": {
-        "camelConnectorGAV": "io.syndesis.connector:connector-rest-swagger:@project.version@",
-        "camelConnectorPrefix": "swagger-operation",
+        "componentSchema": "rest-swagger",
         "configuredProperties": {
           "operationId": "findPetsByTags"
         },
@@ -121,7 +117,7 @@
           "specification": "{\"$schema\":\"http://json-schema.org/schema#\", \"$id\": \"io:syndesis:wrapped\",  \"$id\": \"io:syndesis:wrapped\", \"properties\":{\"body\":{\"items\":{\"properties\":{\"category\":{\"properties\":{\"id\":{\"type\":\"integer\"},\"name\":{\"type\":\"string\"}},\"type\":\"object\",\"xml\":{\"name\":\"Category\"}},\"id\":{\"type\":\"integer\"},\"name\":{\"example\":\"doggie\",\"type\":\"string\"},\"photoUrls\":{\"items\":{\"type\":\"string\"},\"type\":\"array\",\"xml\":{\"name\":\"photoUrl\",\"wrapped\":true}},\"status\":{\"description\":\"pet status in the store\",\"enum\":[\"available\",\"pending\",\"sold\"],\"type\":\"string\"},\"tags\":{\"items\":{\"properties\":{\"id\":{\"type\":\"integer\"},\"name\":{\"type\":\"string\"}},\"type\":\"object\",\"xml\":{\"name\":\"Tag\"}},\"type\":\"array\",\"xml\":{\"name\":\"tag\",\"wrapped\":true}}},\"required\":[\"name\",\"photoUrls\"],\"type\":\"object\",\"xml\":{\"name\":\"Pet\"}},\"type\":\"array\"}},\"type\":\"object\"}"
         }
       },
-      "id": "io.syndesis.connector:connector-rest-swagger:@project.version@:_id_:findPetsByTags",
+      "id": "_id_:findPetsByTags",
       "name": "Finds Pets by tags",
       "pattern": "To",
       "tags": [
@@ -132,8 +128,7 @@
       "actionType": "connector",
       "description": "Returns a single pet",
       "descriptor": {
-        "camelConnectorGAV": "io.syndesis.connector:connector-rest-swagger:@project.version@",
-        "camelConnectorPrefix": "swagger-operation",
+        "componentSchema": "rest-swagger",
         "configuredProperties": {
           "operationId": "getPetById"
         },
@@ -156,7 +151,7 @@
           "specification": "{\"$schema\":\"http://json-schema.org/schema#\", \"$id\": \"io:syndesis:wrapped\", \"type\":\"object\",\"properties\":{\"body\":{\"type\":\"object\",\"required\":[\"name\",\"photoUrls\"],\"properties\":{\"id\":{\"type\":\"integer\"},\"category\":{\"type\":\"object\",\"properties\":{\"id\":{\"type\":\"integer\"},\"name\":{\"type\":\"string\"}},\"xml\":{\"name\":\"Category\"}},\"name\":{\"type\":\"string\",\"example\":\"doggie\"},\"photoUrls\":{\"type\":\"array\",\"xml\":{\"name\":\"photoUrl\",\"wrapped\":true},\"items\":{\"type\":\"string\"}},\"tags\":{\"type\":\"array\",\"xml\":{\"name\":\"tag\",\"wrapped\":true},\"items\":{\"type\":\"object\",\"properties\":{\"id\":{\"type\":\"integer\"},\"name\":{\"type\":\"string\"}},\"xml\":{\"name\":\"Tag\"}}},\"status\":{\"type\":\"string\",\"description\":\"pet status in the store\",\"enum\":[\"available\",\"pending\",\"sold\"]}},\"xml\":{\"name\":\"Pet\"}}}}"
         }
       },
-      "id": "io.syndesis.connector:connector-rest-swagger:@project.version@:_id_:getPetById",
+      "id": "_id_:getPetById",
       "name": "Find pet by ID",
       "pattern": "To",
       "tags": [
@@ -167,8 +162,7 @@
       "actionType": "connector",
       "description": "Send POST request to /pet/{petId}",
       "descriptor": {
-        "camelConnectorGAV": "io.syndesis.connector:connector-rest-swagger:@project.version@",
-        "camelConnectorPrefix": "swagger-operation",
+        "componentSchema": "rest-swagger",
         "configuredProperties": {
           "operationId": "updatePetWithForm"
         },
@@ -185,7 +179,7 @@
           "kind": "none"
         }
       },
-      "id": "io.syndesis.connector:connector-rest-swagger:@project.version@:_id_:updatePetWithForm",
+      "id": "_id_:updatePetWithForm",
       "name": "Updates a pet in the store with form data",
       "pattern": "To",
       "tags": [
@@ -196,8 +190,7 @@
       "actionType": "connector",
       "description": "Send DELETE request to /pet/{petId}",
       "descriptor": {
-        "camelConnectorGAV": "io.syndesis.connector:connector-rest-swagger:@project.version@",
-        "camelConnectorPrefix": "swagger-operation",
+        "componentSchema": "rest-swagger",
         "configuredProperties": {
           "operationId": "deletePet"
         },
@@ -214,7 +207,7 @@
           "kind": "none"
         }
       },
-      "id": "io.syndesis.connector:connector-rest-swagger:@project.version@:_id_:deletePet",
+      "id": "_id_:deletePet",
       "name": "Deletes a pet",
       "pattern": "To",
       "tags": [
@@ -225,8 +218,7 @@
       "actionType": "connector",
       "description": "Send POST request to /pet/{petId}/uploadImage",
       "descriptor": {
-        "camelConnectorGAV": "io.syndesis.connector:connector-rest-swagger:@project.version@",
-        "camelConnectorPrefix": "swagger-operation",
+        "componentSchema": "rest-swagger",
         "configuredProperties": {
           "operationId": "uploadFile"
         },
@@ -249,7 +241,7 @@
           "specification": "{\"$schema\":\"http://json-schema.org/schema#\", \"$id\": \"io:syndesis:wrapped\", \"type\":\"object\",\"properties\":{\"body\":{\"type\":\"object\",\"properties\":{\"code\":{\"type\":\"integer\"},\"type\":{\"type\":\"string\"},\"message\":{\"type\":\"string\"}}}}}"
         }
       },
-      "id": "io.syndesis.connector:connector-rest-swagger:@project.version@:_id_:uploadFile",
+      "id": "_id_:uploadFile",
       "name": "uploads an image",
       "pattern": "To",
       "tags": [
@@ -260,8 +252,7 @@
       "actionType": "connector",
       "description": "Returns a map of status codes to quantities",
       "descriptor": {
-        "camelConnectorGAV": "io.syndesis.connector:connector-rest-swagger:@project.version@",
-        "camelConnectorPrefix": "swagger-operation",
+        "componentSchema": "rest-swagger",
         "configuredProperties": {
           "operationId": "getInventory"
         },
@@ -278,7 +269,7 @@
           "specification": "{\"$schema\":\"http://json-schema.org/schema#\", \"$id\": \"io:syndesis:wrapped\", \"type\":\"object\",\"properties\":{\"body\":{\"type\":\"object\",\"additionalProperties\":{\"type\":\"integer\"}}}}"
         }
       },
-      "id": "io.syndesis.connector:connector-rest-swagger:@project.version@:_id_:getInventory",
+      "id": "_id_:getInventory",
       "name": "Returns pet inventories by status",
       "pattern": "To",
       "tags": [
@@ -289,8 +280,7 @@
       "actionType": "connector",
       "description": "Send POST request to /store/order",
       "descriptor": {
-        "camelConnectorGAV": "io.syndesis.connector:connector-rest-swagger:@project.version@",
-        "camelConnectorPrefix": "swagger-operation",
+        "componentSchema": "rest-swagger",
         "configuredProperties": {
           "operationId": "placeOrder"
         },
@@ -313,7 +303,7 @@
           "specification": "{\"$schema\":\"http://json-schema.org/schema#\", \"$id\": \"io:syndesis:wrapped\", \"type\":\"object\",\"properties\":{\"body\":{\"type\":\"object\",\"properties\":{\"id\":{\"type\":\"integer\"},\"petId\":{\"type\":\"integer\"},\"quantity\":{\"type\":\"integer\"},\"shipDate\":{\"type\":\"string\",\"format\":\"date-time\"},\"status\":{\"type\":\"string\",\"description\":\"Order Status\",\"enum\":[\"placed\",\"approved\",\"delivered\"]},\"complete\":{\"type\":\"boolean\",\"default\":false}},\"xml\":{\"name\":\"Order\"}}}}"
         }
       },
-      "id": "io.syndesis.connector:connector-rest-swagger:@project.version@:_id_:placeOrder",
+      "id": "_id_:placeOrder",
       "name": "Place an order for a pet",
       "pattern": "To",
       "tags": [
@@ -324,8 +314,7 @@
       "actionType": "connector",
       "description": "For valid response try integer IDs with value >= 1 and <= 10. Other values will generated exceptions",
       "descriptor": {
-        "camelConnectorGAV": "io.syndesis.connector:connector-rest-swagger:@project.version@",
-        "camelConnectorPrefix": "swagger-operation",
+        "componentSchema": "rest-swagger",
         "configuredProperties": {
           "operationId": "getOrderById"
         },
@@ -348,7 +337,7 @@
           "specification": "{\"$schema\":\"http://json-schema.org/schema#\", \"$id\": \"io:syndesis:wrapped\", \"type\":\"object\",\"properties\":{\"body\":{\"type\":\"object\",\"properties\":{\"id\":{\"type\":\"integer\"},\"petId\":{\"type\":\"integer\"},\"quantity\":{\"type\":\"integer\"},\"shipDate\":{\"type\":\"string\",\"format\":\"date-time\"},\"status\":{\"type\":\"string\",\"description\":\"Order Status\",\"enum\":[\"placed\",\"approved\",\"delivered\"]},\"complete\":{\"type\":\"boolean\",\"default\":false}},\"xml\":{\"name\":\"Order\"}}}}"
         }
       },
-      "id": "io.syndesis.connector:connector-rest-swagger:@project.version@:_id_:getOrderById",
+      "id": "_id_:getOrderById",
       "name": "Find purchase order by ID",
       "pattern": "To",
       "tags": [
@@ -359,8 +348,7 @@
       "actionType": "connector",
       "description": "For valid response try integer IDs with positive integer value. Negative or non-integer values will generate API errors",
       "descriptor": {
-        "camelConnectorGAV": "io.syndesis.connector:connector-rest-swagger:@project.version@",
-        "camelConnectorPrefix": "swagger-operation",
+        "componentSchema": "rest-swagger",
         "configuredProperties": {
           "operationId": "deleteOrder"
         },
@@ -377,7 +365,7 @@
           "kind": "none"
         }
       },
-      "id": "io.syndesis.connector:connector-rest-swagger:@project.version@:_id_:deleteOrder",
+      "id": "_id_:deleteOrder",
       "name": "Delete purchase order by ID",
       "pattern": "To",
       "tags": [
@@ -388,8 +376,7 @@
       "actionType": "connector",
       "description": "This can only be done by the logged in user.",
       "descriptor": {
-        "camelConnectorGAV": "io.syndesis.connector:connector-rest-swagger:@project.version@",
-        "camelConnectorPrefix": "swagger-operation",
+        "componentSchema": "rest-swagger",
         "configuredProperties": {
           "operationId": "createUser"
         },
@@ -406,7 +393,7 @@
           "kind": "none"
         }
       },
-      "id": "io.syndesis.connector:connector-rest-swagger:@project.version@:_id_:createUser",
+      "id": "_id_:createUser",
       "name": "Create user",
       "pattern": "To",
       "tags": [
@@ -417,8 +404,7 @@
       "actionType": "connector",
       "description": "Send POST request to /user/createWithArray",
       "descriptor": {
-        "camelConnectorGAV": "io.syndesis.connector:connector-rest-swagger:@project.version@",
-        "camelConnectorPrefix": "swagger-operation",
+        "componentSchema": "rest-swagger",
         "configuredProperties": {
           "operationId": "createUsersWithArrayInput"
         },
@@ -435,7 +421,7 @@
           "kind": "none"
         }
       },
-      "id": "io.syndesis.connector:connector-rest-swagger:@project.version@:_id_:createUsersWithArrayInput",
+      "id": "_id_:createUsersWithArrayInput",
       "name": "Creates list of users with given input array",
       "pattern": "To",
       "tags": [
@@ -446,8 +432,7 @@
       "actionType": "connector",
       "description": "Send POST request to /user/createWithList",
       "descriptor": {
-        "camelConnectorGAV": "io.syndesis.connector:connector-rest-swagger:@project.version@",
-        "camelConnectorPrefix": "swagger-operation",
+        "componentSchema": "rest-swagger",
         "configuredProperties": {
           "operationId": "createUsersWithListInput"
         },
@@ -464,7 +449,7 @@
           "kind": "none"
         }
       },
-      "id": "io.syndesis.connector:connector-rest-swagger:@project.version@:_id_:createUsersWithListInput",
+      "id": "_id_:createUsersWithListInput",
       "name": "Creates list of users with given input array",
       "pattern": "To",
       "tags": [
@@ -475,8 +460,7 @@
       "actionType": "connector",
       "description": "Send GET request to /user/login",
       "descriptor": {
-        "camelConnectorGAV": "io.syndesis.connector:connector-rest-swagger:@project.version@",
-        "camelConnectorPrefix": "swagger-operation",
+        "componentSchema": "rest-swagger",
         "configuredProperties": {
           "operationId": "loginUser"
         },
@@ -499,7 +483,7 @@
           "specification": "{\"$schema\":\"http://json-schema.org/schema#\", \"$id\": \"io:syndesis:wrapped\", \"type\":\"object\",\"properties\":{\"body\":{\"type\":\"string\"}}}"
         }
       },
-      "id": "io.syndesis.connector:connector-rest-swagger:@project.version@:_id_:loginUser",
+      "id": "_id_:loginUser",
       "name": "Logs user into the system",
       "pattern": "To",
       "tags": [
@@ -510,8 +494,7 @@
       "actionType": "connector",
       "description": "Send GET request to /user/logout",
       "descriptor": {
-        "camelConnectorGAV": "io.syndesis.connector:connector-rest-swagger:@project.version@",
-        "camelConnectorPrefix": "swagger-operation",
+        "componentSchema": "rest-swagger",
         "configuredProperties": {
           "operationId": "logoutUser"
         },
@@ -522,7 +505,7 @@
           "kind": "none"
         }
       },
-      "id": "io.syndesis.connector:connector-rest-swagger:@project.version@:_id_:logoutUser",
+      "id": "_id_:logoutUser",
       "name": "Logs out current logged in user session",
       "pattern": "To",
       "tags": [
@@ -533,8 +516,7 @@
       "actionType": "connector",
       "description": "Send GET request to /user/{username}",
       "descriptor": {
-        "camelConnectorGAV": "io.syndesis.connector:connector-rest-swagger:@project.version@",
-        "camelConnectorPrefix": "swagger-operation",
+        "componentSchema": "rest-swagger",
         "configuredProperties": {
           "operationId": "getUserByName"
         },
@@ -557,7 +539,7 @@
           "specification": "{\"$schema\":\"http://json-schema.org/schema#\", \"$id\": \"io:syndesis:wrapped\", \"type\":\"object\",\"properties\":{\"body\":{\"type\":\"object\",\"properties\":{\"id\":{\"type\":\"integer\"},\"username\":{\"type\":\"string\"},\"firstName\":{\"type\":\"string\"},\"lastName\":{\"type\":\"string\"},\"email\":{\"type\":\"string\"},\"password\":{\"type\":\"string\"},\"phone\":{\"type\":\"string\"},\"userStatus\":{\"type\":\"integer\",\"description\":\"User Status\"}},\"xml\":{\"name\":\"User\"}}}}"
         }
       },
-      "id": "io.syndesis.connector:connector-rest-swagger:@project.version@:_id_:getUserByName",
+      "id": "_id_:getUserByName",
       "name": "Get user by user name",
       "pattern": "To",
       "tags": [
@@ -568,8 +550,7 @@
       "actionType": "connector",
       "description": "This can only be done by the logged in user.",
       "descriptor": {
-        "camelConnectorGAV": "io.syndesis.connector:connector-rest-swagger:@project.version@",
-        "camelConnectorPrefix": "swagger-operation",
+        "componentSchema": "rest-swagger",
         "configuredProperties": {
           "operationId": "updateUser"
         },
@@ -586,7 +567,7 @@
           "kind": "none"
         }
       },
-      "id": "io.syndesis.connector:connector-rest-swagger:@project.version@:_id_:updateUser",
+      "id": "_id_:updateUser",
       "name": "Updated user",
       "pattern": "To",
       "tags": [
@@ -597,7 +578,7 @@
       "actionType": "connector",
       "description": "This can only be done by the logged in user.",
       "descriptor": {
-        "camelConnectorPrefix": "swagger-operation",
+        "componentSchema": "rest-swagger",
         "configuredProperties": {
           "operationId": "deleteUser"
         },
@@ -614,7 +595,7 @@
           "kind": "none"
         }
       },
-      "id": "io.syndesis.connector:connector-rest-swagger:@project.version@:_id_:deleteUser",
+      "id": "_id_:deleteUser",
       "name": "Delete user",
       "pattern": "To",
       "tags": [

@@ -88,8 +88,7 @@
   },
   {
     "data": {
-      "camelConnectorGAV": "io.syndesis.connector:connector-rest-swagger:@syndesis.version@",
-      "camelConnectorPrefix": "swagger-operation",
+      "componentSchema": "rest-swagger",
       "connectorGroup": {
         "id": "swagger-connector-template"
       },

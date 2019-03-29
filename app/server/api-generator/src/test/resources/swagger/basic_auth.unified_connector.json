@@ -4,8 +4,7 @@
       "actionType": "connector",
       "description": "Send GET request to /operation",
       "descriptor": {
-        "camelConnectorGAV": "io.syndesis.connector:connector-rest-swagger:@syndesiss.version@",
-        "camelConnectorPrefix": "swagger-operation",
+        "componentScheme": "rest-swagger",
         "configuredProperties": {
           "operationId": "operation-0"
         },
@@ -16,7 +15,7 @@
           "kind": "none"
         }
       },
-      "id": "io.syndesis.connector:connector-rest-swagger:@project.version@:_id_:operation-0",
+      "id": "_id_:operation-0",
       "name": "GET /operation",
       "pattern": "To"
     }

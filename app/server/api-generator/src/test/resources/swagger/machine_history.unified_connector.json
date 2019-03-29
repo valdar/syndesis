@@ -2,16 +2,9 @@
   "actions": [
     {
       "actionType": "connector",
-      "dependencies": [
-        {
-          "id": "io.syndesis.connector:connector-rest-swagger:@project.version@",
-          "type": "MAVEN"
-        }
-      ],
       "description": "Send GET request to /machines",
       "descriptor": {
-        "camelConnectorGAV": "io.syndesis.connector:connector-rest-swagger:@project.version@",
-        "camelConnectorPrefix": "swagger-operation",
+        "componentScheme": "rest-swagger",
         "configuredProperties": {
           "operationId": "operation-0"
         },
@@ -32,22 +25,15 @@
           "specification": "{\"$schema\":\"http://json-schema.org/schema#\",\"type\":\"object\",\"$id\":\"io:syndesis:wrapped\",\"properties\":{\"body\":{\"type\":\"array\",\"items\":{\"type\":\"integer\"}}}}"
         }
       },
-      "id": "io.syndesis.connector:connector-rest-swagger:@project.version@:_id_:operation-0",
+      "id": "_id_:operation-0",
       "name": "GET /machines",
       "pattern": "To"
     },
     {
       "actionType": "connector",
-      "dependencies": [
-        {
-          "id": "io.syndesis.connector:connector-rest-swagger:@project.version@",
-          "type": "MAVEN"
-        }
-      ],
       "description": "Send GET request to /machines/{id}",
       "descriptor": {
-        "camelConnectorGAV": "io.syndesis.connector:connector-rest-swagger:@project.version@",
-        "camelConnectorPrefix": "swagger-operation",
+        "componentSchema": "rest-swagger",
         "configuredProperties": {
           "operationId": "operation-1"
         },
@@ -74,7 +60,7 @@
           "specification": "{\"$schema\":\"http://json-schema.org/schema#\",\"type\":\"object\",\"$id\":\"io:syndesis:wrapped\",\"properties\":{\"body\":{\"type\":\"object\",\"description\":\"The representation of the current state of a machine\",\"required\":[\"id\",\"name\",\"health\"],\"properties\":{\"id\":{\"description\":\"The machine ID\",\"type\":\"integer\"},\"name\":{\"description\":\"The machine name\",\"type\":\"string\"},\"health\":{\"description\":\"The machine health\",\"type\":\"integer\"}}}}}"
         }
       },
-      "id": "io.syndesis.connector:connector-rest-swagger:@project.version@:_id_:operation-1",
+      "id": "_id_:operation-1",
       "name": "Gets the machine state",
       "pattern": "To"
     }

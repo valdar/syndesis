@@ -838,8 +838,8 @@ public class Equivalencer implements StringConstants {
 
         return compare(context,
                        pair(one.getConnectorId(), another.getConnectorId(), "connector-id"),
-                       pair(one.getCamelConnectorGAV(), another.getCamelConnectorGAV(), "camel-connector-gav"),
-                       pair(one.getCamelConnectorPrefix(), another.getCamelConnectorPrefix(), "camel-connector-prefix"),
+//                       pair(one.getCamelConnectorGAV(), another.getCamelConnectorGAV(), "camel-connector-gav"),
+//                       pair(one.getCamelConnectorPrefix(), another.getCamelConnectorPrefix(), "camel-connector-prefix"),
                        pair(one.getComponentScheme(), another.getComponentScheme(), "component-scheme"),
                        pair(one.getConnectorFactory(), another.getConnectorFactory(), "connector-factory"),
                        pair(one.getConnectorCustomizers(), another.getConnectorCustomizers(), "connector-customizers"),

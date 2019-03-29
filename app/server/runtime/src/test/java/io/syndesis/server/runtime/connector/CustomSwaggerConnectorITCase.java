@@ -130,6 +130,7 @@ public class CustomSwaggerConnectorITCase extends BaseITCase {
         return new ConnectorTemplate.Builder()//
             .id(id)//
             .name(name)//
+            .componentSchema("timer")
             .build();
     }
 }

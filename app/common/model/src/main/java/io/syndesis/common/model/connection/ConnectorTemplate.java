@@ -16,12 +16,15 @@
 package io.syndesis.common.model.connection;
 
 import java.io.Serializable;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 import io.syndesis.common.model.Kind;
+import io.syndesis.common.model.WithDependencies;
 import io.syndesis.common.model.WithId;
 import io.syndesis.common.model.WithName;
 import io.syndesis.common.model.WithProperties;
@@ -31,7 +34,7 @@ import org.immutables.value.Value;
 @Value.Immutable
 @JsonDeserialize(builder = ConnectorTemplate.Builder.class)
 @SuppressWarnings("immutables")
-public interface ConnectorTemplate extends WithId<ConnectorTemplate>, WithName, WithProperties, Serializable {
+public interface ConnectorTemplate extends WithId<ConnectorTemplate>, WithName, WithDependencies, WithProperties, Serializable {
 
     class Builder extends ImmutableConnectorTemplate.Builder implements WithPropertiesBuilder<Builder> {
         // make ImmutableConnectorTemplate.Builder accessible
@@ -42,6 +45,13 @@ public interface ConnectorTemplate extends WithId<ConnectorTemplate>, WithName, 
     }
 
     String getComponentSchema();
+
+    Optional<String> getConnectorFactory();
+
+    @Value.Default
+    default List<String> getConnectorCustomizers() {
+        return Collections.emptyList();
+    }
 
     Optional<ConnectorGroup> getConnectorGroup();
 

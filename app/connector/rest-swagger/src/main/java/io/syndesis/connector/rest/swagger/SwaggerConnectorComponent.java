@@ -15,15 +15,15 @@
  */
 package io.syndesis.connector.rest.swagger;
 
-import io.syndesis.integration.component.proxy.ComponentDefinition;
-import io.syndesis.integration.component.proxy.ComponentProxyComponent;
-import org.apache.camel.Endpoint;
-
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import io.syndesis.integration.component.proxy.ComponentDefinition;
+import io.syndesis.integration.component.proxy.ComponentProxyComponent;
+import org.apache.camel.Endpoint;
 
 public final class SwaggerConnectorComponent extends ComponentProxyComponent {
 
@@ -51,12 +51,8 @@ public final class SwaggerConnectorComponent extends ComponentProxyComponent {
 
     private String username;
 
-    public SwaggerConnectorComponent() {
-        this(null);
-    }
-
-    public SwaggerConnectorComponent(final String componentSchema) {
-        super("swagger-connector", componentSchema);
+    public SwaggerConnectorComponent(final String componentId, final String componentSchema) {
+        super(componentId, componentSchema);
     }
 
     public String getAccessToken() {
@@ -170,8 +166,6 @@ public final class SwaggerConnectorComponent extends ComponentProxyComponent {
     @Override
     protected Endpoint createDelegateEndpoint(ComponentDefinition definition, String scheme, Map<String, String> options) throws Exception {
         final Endpoint endpoint = super.createDelegateEndpoint(definition, scheme, options);
-
-
 
         if (authenticationType == AuthenticationType.oauth2 && refreshToken != null && !refreshTokenRetryStatuses.isEmpty()) {
             Configuration configuration = (Configuration)getOption("xxx");

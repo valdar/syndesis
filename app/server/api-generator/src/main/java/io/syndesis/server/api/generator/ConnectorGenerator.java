@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *     http:www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -38,9 +38,9 @@ public abstract class ConnectorGenerator {
     protected final Connector baseConnectorFrom(final ConnectorTemplate connectorTemplate, final ConnectorSettings connectorSettings) {
         final Set<String> properties = connectorTemplate.getProperties().keySet();
 
-        final Map<String, String> configuredProperties = connectorSettings.getConfiguredProperties()//
-            .entrySet().stream()//
-            .filter(e -> properties.contains(e.getKey()))//
+        final Map<String, String> configuredProperties = connectorSettings.getConfiguredProperties()
+            .entrySet().stream()
+            .filter(e -> properties.contains(e.getKey()))
             .collect(Collectors.toMap(Entry::getKey, Entry::getValue));
 
         final String name = Optional.ofNullable(connectorSettings.getName())
@@ -58,14 +58,17 @@ public abstract class ConnectorGenerator {
             icon = IconGenerator.generate(connectorTemplate.getId().get(), name);
         }
 
-        return new Connector.Builder()//
-            .id(KeyGenerator.createKey())//
-            .name(name)//
-            .description(description)//
-            .icon(icon)//
-            .configuredProperties(configuredProperties)//
-            .connectorGroup(connectorGroup)//
-            .connectorGroupId(connectorGroup.map(ConnectorGroup::getId).orElse(Optional.empty()))//
+        return new Connector.Builder()
+            .id(KeyGenerator.createKey())
+            .name(name)
+            .description(description)
+            .icon(icon)
+            .configuredProperties(configuredProperties)
+            .connectorGroup(connectorGroup)
+            .connectorGroupId(connectorGroup.map(ConnectorGroup::getId).orElse(Optional.empty()))
+            .addAllDependencies(connectorTemplate.getDependencies())
+            .addAllConnectorCustomizers(connectorTemplate.getConnectorCustomizers())
+            .connectorFactory(connectorTemplate.getConnectorFactory())
             .build();
     }
 

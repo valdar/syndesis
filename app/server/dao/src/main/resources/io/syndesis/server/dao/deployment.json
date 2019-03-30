@@ -75,6 +75,19 @@
   {
     "data": {
       "componentSchema": "rest-swagger",
+      "dependencies": [
+        {
+          "id": "io.syndesis.connector:connector-rest-swagger:@project.version@",
+          "type": "MAVEN"
+        }
+      ],
+      "connectorFactory": "io.syndesis.connector.rest.swagger.SwaggerConnectorFactory",
+      "connectorCustomizers": [
+        "io.syndesis.connector.rest.swagger.SpecificationResourceCustomizer",
+        "io.syndesis.connector.rest.swagger.AuthenticationCustomizer",
+        "io.syndesis.connector.rest.swagger.RequestCustomizer",
+        "io.syndesis.connector.rest.swagger.ResponseCustomizer"
+      ],
       "connectorGroup": {
         "id": "swagger-connector-template"
       },

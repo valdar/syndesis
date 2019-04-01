@@ -16,6 +16,8 @@
 package io.syndesis.connector.rest.swagger;
 
 import java.io.File;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -30,7 +32,7 @@ public class SpecificationResourceCustomizerTest {
     private static final ComponentProxyComponent NOT_USED = null;
 
     @Test
-    public void shouldStoreSpecificationInTemporaryDirectory() {
+    public void shouldStoreSpecificationInTemporaryDirectory() throws URISyntaxException {
         final SpecificationResourceCustomizer customizer = new SpecificationResourceCustomizer();
 
         final Map<String, Object> options = new HashMap<>();
@@ -40,6 +42,6 @@ public class SpecificationResourceCustomizerTest {
 
         assertThat(options).containsKey("specificationUri");
         assertThat(options).doesNotContainKey("specification");
-        assertThat(new File((String) options.get("specificationUri"))).hasContent("the specification is here");
+        assertThat(new File(new URI((String) options.get("specificationUri")))).hasContent("the specification is here");
     }
 }

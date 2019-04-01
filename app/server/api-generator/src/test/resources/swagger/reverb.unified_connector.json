@@ -4848,6 +4848,19 @@
   "connectorGroup": {
     "id": "swagger-connector-template"
   },
+  "dependencies": [
+    {
+      "type": "MAVEN",
+      "id": "io.syndesis.connector:connector-rest-swagger:1.7-SNAPSHOT"
+    }
+  ],
+  "connectorFactory": "io.syndesis.connector.rest.swagger.SwaggerConnectorFactory",
+  "connectorCustomizers": [
+    "io.syndesis.connector.rest.swagger.SpecificationResourceCustomizer",
+    "io.syndesis.connector.rest.swagger.AuthenticationCustomizer",
+    "io.syndesis.connector.rest.swagger.RequestCustomizer",
+    "io.syndesis.connector.rest.swagger.ResponseCustomizer"
+  ],
   "connectorGroupId": "swagger-connector-template",
   "description": "reverb",
   "name": "reverb",

@@ -15,9 +15,6 @@
  */
 package io.syndesis.server.controller.integration.camelk;
 
-import java.util.Collections;
-import java.util.Properties;
-
 import io.fabric8.kubernetes.api.model.Secret;
 import io.syndesis.common.model.action.ConnectorAction;
 import io.syndesis.common.model.action.ConnectorDescriptor;
@@ -32,9 +29,13 @@ import io.syndesis.common.util.KeyGenerator;
 import io.syndesis.common.util.MavenProperties;
 import io.syndesis.integration.project.generator.ProjectGenerator;
 import io.syndesis.integration.project.generator.ProjectGeneratorConfiguration;
+import io.syndesis.server.controller.ControllersConfigurationProperties;
 import io.syndesis.server.endpoint.v1.VersionService;
 import io.syndesis.server.openshift.OpenShiftServiceNoOp;
 import org.junit.Test;
+
+import java.util.Collections;
+import java.util.Properties;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -105,7 +106,8 @@ public class CamelKPublishHandlerTest {
             null,
             manager,
             new VersionService(),
-            Collections.emptyList());
+            Collections.emptyList(),
+            new ControllersConfigurationProperties());
 
         Secret secret = handler.createIntegrationSecret(deployment);
 
@@ -152,7 +154,8 @@ public class CamelKPublishHandlerTest {
             null,
             manager,
             new VersionService(),
-            Collections.emptyList());
+            Collections.emptyList(),
+            new ControllersConfigurationProperties());
 
 
         io.syndesis.server.controller.integration.camelk.crd.Integration i = handler.createIntegrationCR(deployment);

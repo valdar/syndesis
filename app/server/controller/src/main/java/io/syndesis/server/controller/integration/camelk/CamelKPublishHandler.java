@@ -299,7 +299,6 @@ public class CamelKPublishHandler extends BaseCamelKHandler implements StateChan
                                                     +"prometheus.io/scrape")
                 .build());
 
-        
         this.configuration.getCamelk().getEnvironment().forEach((k, v) -> {
             integrationSpecBuilder.addConfiguration(new ConfigurationSpec.Builder().type("env").value(k + "=" + v).build());
         });

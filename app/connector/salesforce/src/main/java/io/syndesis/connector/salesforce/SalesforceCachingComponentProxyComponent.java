@@ -96,7 +96,7 @@ public class SalesforceCachingComponentProxyComponent extends ComponentProxyComp
                         super.suspend();
                         ServiceHelper.suspendService(producer.get());
                     }
-                    
+
                     @Override
                     public void resume() throws Exception {
                         super.resume();

@@ -7133,7 +7133,7 @@
   "dependencies": [
     {
       "type": "MAVEN",
-      "id": "io.syndesis.connector:connector-rest-swagger:1.7-SNAPSHOT"
+      "id": "io.syndesis.connector:connector-rest-swagger:@project.version@"
     }
   ],
   "connectorFactory": "io.syndesis.connector.rest.swagger.SwaggerConnectorFactory",
